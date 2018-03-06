@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 void main() => runApp(new MyApp());
-final List<Player> play = <Player>[new Player("Playre 1", 0)];
+final List<Player> play = <Player>[new Player("Player 1", 0)];
 
 class MyApp extends StatelessWidget {
   @override
