@@ -23,13 +23,14 @@ class Players extends StatefulWidget {
 
 class PlayersState extends State<Players> {
   PlayersState();
-  bool _active = false;
   int _players = 1;
+  int _playerName = 1;
 
   void _addPlayer() {
-    play.add(new Player("Player ${_players+1}", 0));
+    play.add(new Player("Player ${_playerName + 1}", 0));
     setState(() {
       _players++;
+      _playerName++;
     });
   }
 
@@ -56,43 +57,90 @@ class PlayersState extends State<Players> {
   Widget _buildText() {
     return new ListView.builder(
       itemBuilder: (BuildContext context, int index) {
-        return new BuildRow(index, _active, rePaint);
+        return new BuildRow(index, removePlayer, rePaint);
       },
       itemCount: _players,
     );
   }
 
-  void rePaint(bool active) {
+  void
+
+  rePaint
+
+  (void b)
+
+  {
+  setState(() {});
+  }
+
+  void removePlayer(int index)
+
+  {
     setState(() {
-      _active = active;
+  print(play);
+  play.removeAt(index);
+  print(play);
+  _players--;
     });
   }
 }
 
 class BuildRow extends StatefulWidget {
-  BuildRow(this.index, this._active, this._onChanged);
-  final bool _active;
-  final ValueChanged<bool> _onChanged;
+  BuildRow(this.index, this._removePlayer, this._onChanged);
+
+  final ValueChanged<int> _removePlayer;
+
+  final ValueChanged
+
+  <
+
+  void
+
+  >
+
+  _onChanged
+
+  ;
   final int index;
+
   @override
-  createState() =>
-      new BuildRowState(index: index, active: _active, onChanged: _onChanged);
+  createState()
+
+  => new BuildRowState(
+  index: index, removePlayer:
+
+  _removePlayer
+
+  ,
+
+  onChanged
+
+      :
+
+  _onChanged
+
+  );
 }
 
 class BuildRowState extends State<BuildRow> {
-  BuildRowState({this.index, this.active: false, this.onChanged});
+  BuildRowState({this.index, this.removePlayer, this.onChanged});
 
-  final bool active;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<int> removePlayer;
 
-  void _resetGame() {
-    onChanged(!active);
-  }
+  final ValueChanged
 
+  <
+
+  void
+
+  >
+
+  onChanged
+
+  ;
   final int index;
   final _biggerFont = const TextStyle(fontSize: 18.0, color: Colors.black);
-  final _deleting = const TextStyle(
-      fontSize: 18.0, color: Colors.white);
+  final _deleting = const TextStyle(fontSize: 18.0, color: Colors.white);
   final TextEditingController _controller = new TextEditingController();
 
   Widget _buildRow(int index) {
@@ -100,174 +148,139 @@ class BuildRowState extends State<BuildRow> {
     bool longpress = false;
     _controller.addListener(nameChange);
     return new Container(
-    decoration: (longpress)?new BoxDecoration(color:Colors.red):null,
-        child:new ListTile(
-      title: new GestureDetector(
-        onHorizontalDragStart: (e) {
-          print("start drag");
-          setState(() {
-            longpress = true;
-          });
-        },
-        onHorizontalDragUpdate: (e) {
-          if (longpress = true && e.delta.dx < -20) {
-
-            print("Wow");
-          }else{
-            null;
-          }
-        },
-        child: new TextField(
-          controller: _controller,
-          style: (longpress) ? _deleting : _biggerFont,
-          decoration: new InputDecoration(
-            hintText: play[index].name,
-          ),
-        ),
-      ),
-      trailing: new GestureDetector(
-        onHorizontalDragUpdate: (e) {
-          if (e.sourceTimeStamp.inMilliseconds - lasttimestamp > 300) {
-            lasttimestamp = e.sourceTimeStamp.inMilliseconds;
-            if (e.delta.dx < -3 && play[index].value < 60) {
-              print(e.sourceTimeStamp.inMilliseconds);
-              play[index].valueUp();
-              setState(() {});
-              if (play[index].value == 60) {
-                AlertDialog alert = new AlertDialog(
-                  title: new Text("Vincitore!!"),
-                  content: new Text("${play[index]
-                          .name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
-                  actions: <Widget>[
-                    new CloseButton(),
-                    new MaterialButton(
-                      onPressed: resetGame,
-                      child: new Icon(
-                        Icons.done,
-                        color: Colors.black,
-                      ),
-                    )
-                  ],
-                );
-                showDialog(child: alert, context: context);
-              } else {
-                null;
-              }
-            } else if (e.delta.dx > 3 && play[index].value != 0) {
-              print(e.sourceTimeStamp.inMilliseconds);
-
-              setState(() {
-                play[index].valueDown();
-              });
-            } else {
-              null;
-            }
-          }
-        },
-        child: new Row(children: <Widget>[
-          new MaterialButton(
-            onPressed: () {
-              if (play[index].value != 0) {
-                setState(() {
-                  play[index].valueDown();
-                });
-              } else {
-                null;
-              }
-            },
-            child: new Text(
-              '${(play[index].value!=0)?play[index].value-1:''}',
-              style: new TextStyle(color: Colors.grey),
-            ),
-          ),
-          new Text('${play[index].value}'),
-          new MaterialButton(
-            onPressed: () {
-              if (play[index].value < 60) play[index].valueUp();
-              setState(() {});
-              if (play[index].value == 60) {
-                AlertDialog alert = new AlertDialog(
-                  title: new Text("Vincitore!!"),
-                  content: new Text(
-                      "${play[index].name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
-                  actions: <Widget>[
-                    new CloseButton(),
-                    new MaterialButton(
-                      onPressed: resetGame,
-                      child: new Icon(
-                        Icons.done,
-                        color: Colors.black,
-                      ),
-                    )
-                  ],
-                );
-                showDialog(child: alert, context: context);
-              } else {
-                null;
-              }
-            },
-            child: new Text(
-              '${play[index].value+1}',
-              style: new TextStyle(color: Colors.grey),
-            ),
-          )
-        ]),
-      ),
-    ));
-  }
-
-  /*
-  void scrollController(){
-    print(_scrollController.position.axisDirection);
-    switch(_scrollController.position.axisDirection) {
-      case AxisDirection.right:
-        if (play[index].value != 0) {
-          setState(() {
-            play[index].valueDown();
-          });
-        } else {
-          null;
-        }
-        break;
-      case AxisDirection.left:
-        if (play[index].value < 60) play[index].valueUp();
-        setState(() {});
-        if (play[index].value == 60) {
-          AlertDialog alert = new AlertDialog(
-            title: new Text("Vincitore!!"),
-            content: new Text(
-                "${play[index].name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
-            actions: <Widget>[
-              new CloseButton(),
-              new MaterialButton(
-                onPressed: resetGame,
-                child: new Icon(
-                  Icons.done,
-                  color: Colors.black,
-                ),
-              )
-            ],
-          );
-          showDialog(child: alert, context: context);
-        } else {
-          null;
-        }
-        break;
-        case AxisDirection.down :
-        null;
-        break;
-      case AxisDirection.up:
-        null;
-        break;
+    decoration: (longpress) ? new BoxDecoration(color: Colors.red) : null,
+    child: new ListTile(
+    title: new GestureDetector(
+    onHorizontalDragEnd: (e) {
+    print("drag end");
+    setState(() {
+    if (longpress && e.primaryVelocity > 0) {
+    _removePlayer(index);
     }
+    longpress = false;
+    });
+    },
+    onHorizontalDragUpdate: (e) {
+    if (e.globalPosition.distance > 300) {
+    longpress = true;
+    }
+    },
+    child: new TextField(
+    controller: _controller,
+  style: (longpress) ? _deleting : _biggerFont,
+  decoration: new InputDecoration(
+  hintText: play[index].name,
+  ),
+  ),
+  ),
+  trailing: new GestureDetector(
+  onHorizontalDragUpdate: (e) {
+  if (e.sourceTimeStamp.inMilliseconds - lasttimestamp > 300) {
+  lasttimestamp = e.sourceTimeStamp.inMilliseconds;
+  if (e.delta.dx < -3 && play[index].value < 60) {
+  print(e.sourceTimeStamp.inMilliseconds);
+  play[index].valueUp();
+  setState(() {});
+  if (play[index].value == 60) {
+  AlertDialog alert = new AlertDialog(
+  title: new Text("Vincitore!!"),
+  content: new Text("${play[index]
+                          .name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
+  actions: <Widget>[
+  new CloseButton(),
+  new MaterialButton(
+  onPressed: resetGame,
+  child: new Icon(
+  Icons.done,
+  color: Colors.black,
+  ),
+  )
+  ],
+  );
+  showDialog(child: alert, context: context);
+  } else {
+  null;
   }
-*/
+  } else
+  if (e.delta.dx > 3 && play[index].value != 0) {
+  print(e.sourceTimeStamp.inMilliseconds);
+
+  setState(() {
+  play[index].valueDown();
+  });
+  } else {
+  null;
+  }
+  }
+  },
+  child: new Row(children: <Widget>[
+  new MaterialButton(
+  onPressed: () {
+  if (play[index].value != 0) {
+  setState(() {
+  play[index].valueDown();
+  });
+  } else {
+  null;
+  }
+  },
+  child: new Text(
+  '${(play[index].value!=0)?play[index].value-1:''}',
+  style: new TextStyle(color: Colors.grey),
+  ),
+  ),
+  new Text('${play[index].value}'),
+  new MaterialButton(
+  onPressed: () {
+  if (play[index].value < 60) play[index].valueUp();
+  setState(() {});
+  if (play[index].value == 60) {
+  AlertDialog alert = new AlertDialog(
+  title: new Text("Vincitore!!"),
+  content: new Text(
+  "${play[index].name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
+  actions: <Widget>[
+  new CloseButton(),
+  new MaterialButton(
+  onPressed: resetGame,
+  child: new Icon(
+  Icons.done,
+  color: Colors.black,
+  ),
+  )
+  ],
+  );
+  showDialog(child: alert, context: context);
+  } else {
+  null;
+  }
+  },
+  child: new Text(
+  '${play[index].value+1}',
+  style: new TextStyle(color: Colors.grey),
+  ),
+  )
+  ]),
+  ),
+  ));
+  }
+
   void resetGame() {
     Navigator.pop(context);
     for (var pl in play) {
       pl.setValue(0);
     }
     _resetGame();
+  }
+
+  void _removePlayer(int index) {
+  removePlayer(index);
+  }
+
+  void _resetGame()
+
+  {
+  onChanged(null);
   }
 
   void nameChange() {
