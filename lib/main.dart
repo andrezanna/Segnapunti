@@ -147,27 +147,22 @@ class BuildRowState extends State<BuildRow> {
     int lasttimestamp = 0;
     bool longpress = false;
     _controller.addListener(nameChange);
-    return new Container(
-    decoration: (longpress) ? new BoxDecoration(color: Colors.red) : null,
-    child: new ListTile(
-    title: new GestureDetector(
-    onHorizontalDragEnd: (e) {
-    print("drag end");
+    return new Dismissible(
+    key: new ObjectKey(play[index]),
+    direction: DismissDirection.endToStart,
+    onDismissed: (DismissDirection direction) {
     setState(() {
-    if (longpress && e.primaryVelocity > 0) {
     _removePlayer(index);
-    }
-    longpress = false;
+    this.dispose();
     });
     },
-    onHorizontalDragUpdate: (e) {
-    if (e.globalPosition.distance > 300) {
-    longpress = true;
-    }
-    },
+    background:
+    new Container(decoration: new BoxDecoration(color: Colors.red)),
+    child: new ListTile(
+    title: new Container(
     child: new TextField(
     controller: _controller,
-  style: (longpress) ? _deleting : _biggerFont,
+    style: (longpress) ? _deleting : _biggerFont,
   decoration: new InputDecoration(
   hintText: play[index].name,
   ),
@@ -301,6 +296,8 @@ class Player {
   String name;
   int value;
   Player(this.name, this.value);
+
+  Key get key => new ObjectKey(this);
 
   void setValue(int value) {
     this.value = value;
