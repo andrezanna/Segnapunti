@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 void main() => runApp(new MyApp());
-final List<Player> play = <Player>[new Player("Playre 1", 0)];
+final List<Player> play = <Player>[new Player("Player 1", 0)];
 
 class MyApp extends StatelessWidget {
   @override
@@ -77,9 +78,7 @@ class PlayersState extends State<Players> {
 
   {
     setState(() {
-  print(play);
   play.removeAt(index);
-  print(play);
   _players--;
     });
   }
@@ -144,119 +143,75 @@ class BuildRowState extends State<BuildRow> {
   final TextEditingController _controller = new TextEditingController();
 
   Widget _buildRow(int index) {
-    int lasttimestamp = 0;
     bool longpress = false;
+    bool maxReached = false;
     _controller.addListener(nameChange);
-    return new Dismissible(
-    key: new ObjectKey(play[index]),
-    direction: DismissDirection.endToStart,
-    onDismissed: (DismissDirection direction) {
+    NumberPicker p=new NumberPicker.integer(
+    minValue: 0,
+    maxValue: 60,
+    horizontal: true,
+    initialValue: play[index].value,
+    listViewWidth: 150.0,
+    listViewHeight: 50.0,
+    itemExtent: 50.0,
+    onChanged: (newValue) {
     setState(() {
-    _removePlayer(index);
-    this.dispose();
+    play[index].value = newValue;
+    if (play[index].value == 60 && !maxReached) {
+    maxReached = true;
+    AlertDialog alert = new AlertDialog(
+    title: new Text("Vincitore!!"),
+    content: new Text("${play[index]
+        .name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
+    actions: <Widget>[
+    new MaterialButton(
+    onPressed: () {
+    maxReached = false;
+    Navigator.pop(context);
+    },
+    child: new Icon(
+    Icons.close,
+    color: Colors.black,
+    ),
+    ),
+    new MaterialButton(
+    onPressed: resetGame,
+    child: new Icon(
+    Icons.done,
+    color: Colors.black,
+    ),
+    )
+    ],
+    );
+    showDialog(child: alert, context: context);
+    } else {
+    null;
+    }
     });
     },
-    background:
-    new Container(decoration: new BoxDecoration(color: Colors.red)),
-    child: new ListTile(
-    title: new Container(
-    child: new TextField(
-    controller: _controller,
-    style: (longpress) ? _deleting : _biggerFont,
+    );
+    play[index].setNumberPicker(p);
+    return new Dismissible(
+    key: new ObjectKey(play[index]),
+  direction: DismissDirection.endToStart,
+  onDismissed: (DismissDirection direction) {
+  setState(() {
+  _removePlayer(index);
+  });
+  },
+  background:
+  new Container(decoration: new BoxDecoration(color: Colors.red)),
+  child: new ListTile(
+  title: new Container(
+  child: new TextField(
+  controller: _controller,
+  style: (longpress) ? _deleting : _biggerFont,
   decoration: new InputDecoration(
   hintText: play[index].name,
   ),
   ),
   ),
-  trailing: new GestureDetector(
-  onHorizontalDragUpdate: (e) {
-  if (e.sourceTimeStamp.inMilliseconds - lasttimestamp > 300) {
-  lasttimestamp = e.sourceTimeStamp.inMilliseconds;
-  if (e.delta.dx < -3 && play[index].value < 60) {
-  print(e.sourceTimeStamp.inMilliseconds);
-  play[index].valueUp();
-  setState(() {});
-  if (play[index].value == 60) {
-  AlertDialog alert = new AlertDialog(
-  title: new Text("Vincitore!!"),
-  content: new Text("${play[index]
-                          .name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
-  actions: <Widget>[
-  new CloseButton(),
-  new MaterialButton(
-  onPressed: resetGame,
-  child: new Icon(
-  Icons.done,
-  color: Colors.black,
-  ),
-  )
-  ],
-  );
-  showDialog(child: alert, context: context);
-  } else {
-  null;
-  }
-  } else
-  if (e.delta.dx > 3 && play[index].value != 0) {
-  print(e.sourceTimeStamp.inMilliseconds);
-
-  setState(() {
-  play[index].valueDown();
-  });
-  } else {
-  null;
-  }
-  }
-  },
-  child: new Row(children: <Widget>[
-  new MaterialButton(
-  onPressed: () {
-  if (play[index].value != 0) {
-  setState(() {
-  play[index].valueDown();
-  });
-  } else {
-  null;
-  }
-  },
-  child: new Text(
-  '${(play[index].value!=0)?play[index].value-1:''}',
-  style: new TextStyle(color: Colors.grey),
-  ),
-  ),
-  new Text('${play[index].value}'),
-  new MaterialButton(
-  onPressed: () {
-  if (play[index].value < 60) play[index].valueUp();
-  setState(() {});
-  if (play[index].value == 60) {
-  AlertDialog alert = new AlertDialog(
-  title: new Text("Vincitore!!"),
-  content: new Text(
-  "${play[index].name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
-  actions: <Widget>[
-  new CloseButton(),
-  new MaterialButton(
-  onPressed: resetGame,
-  child: new Icon(
-  Icons.done,
-  color: Colors.black,
-  ),
-  )
-  ],
-  );
-  showDialog(child: alert, context: context);
-  } else {
-  null;
-  }
-  },
-  child: new Text(
-  '${play[index].value+1}',
-  style: new TextStyle(color: Colors.grey),
-  ),
-  )
-  ]),
-  ),
+  trailing: p,
   ));
   }
 
@@ -264,6 +219,7 @@ class BuildRowState extends State<BuildRow> {
     Navigator.pop(context);
     for (var pl in play) {
       pl.setValue(0);
+      pl.np.animateInt(0);
     }
     _resetGame();
   }
@@ -295,14 +251,18 @@ class BuildRowState extends State<BuildRow> {
 class Player {
   String name;
   int value;
+  NumberPicker np;
   Player(this.name, this.value);
 
-  Key get key => new ObjectKey(this);
+  Key get key => new ObjectKey(this.hashCode);
 
   void setValue(int value) {
     this.value = value;
   }
 
+  void setNumberPicker(NumberPicker p) {
+    this.np = p;
+  }
   void valueDown() {
     this.value -= 1;
   }

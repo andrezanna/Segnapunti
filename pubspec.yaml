@@ -1,11 +1,12 @@
-name: flutter_app
-description: A new Flutter application.
+name: Segnapunti
+description: Test Segnapunti Flutter.
 
 dependencies:
   flutter:
     sdk: flutter
   numberpicker:
-    path: ../NumberPicker
+    git:
+      url: git@github.com:andrezanna/NumberPicker.git
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.0
