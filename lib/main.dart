@@ -31,7 +31,9 @@ class Parent extends StatelessWidget {
             backgroundColor: Colors.blue,
           ),
           body: new MyApp(),
-        ));
+        )
+    );
+
   }
 }
 

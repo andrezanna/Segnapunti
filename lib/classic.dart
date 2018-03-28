@@ -1,4 +1,6 @@
+
 import 'package:Segnapunti/classicplayer.dart';
+import 'package:Segnapunti/util.dart' as Util;
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 
@@ -11,8 +13,10 @@ final List<ClassicPlayer> play = <ClassicPlayer>[
   new ClassicPlayer("Player 1", minValue),
   new ClassicPlayer("Player 2", minValue),
 ];
+
 int minValue = 0;
 int maxValue = 60;
+final ScrollController scrollController = new ScrollController();
 
 class ClassicState extends State<Classic> {
   ClassicState();
@@ -57,6 +61,7 @@ class ClassicState extends State<Classic> {
 
   Widget _buildText() {
     return new ListView.builder(
+      controller: scrollController,
       itemBuilder: (BuildContext context, int index) {
         return new BuildRow(index, removePlayer, rePaint);
       },
@@ -144,11 +149,12 @@ class BuildRowState extends State<BuildRow> {
   ;
   final int index;
   final TextEditingController _controller = new TextEditingController();
-
   bool maxReached = false;
+  FocusNode focusNode = new FocusNode();
 
   Widget _buildRow(int index) {
   _controller.addListener(nameChange);
+  focusNode.addListener(_ensureVisible);
   NumberPicker p = buildPickerInteger(index);
   play[index].setNumberPicker(p);
   return new Dismissible(
@@ -165,6 +171,7 @@ class BuildRowState extends State<BuildRow> {
   title: new Container(
   child: new TextField(
   controller: _controller,
+  focusNode: focusNode,
   decoration: new InputDecoration(
   hintText: play[index].name,
   ),
@@ -174,6 +181,10 @@ class BuildRowState extends State<BuildRow> {
   ));
   }
 
+
+  void _ensureVisible(){
+  Util.ensureVisible(context, focusNode);
+  }
   Widget buildPickerInteger(int index) {
   return new NumberPicker.integer(
   minValue: minValue,
@@ -237,6 +248,9 @@ class BuildRowState extends State<BuildRow> {
   }
 
   void nameChange() {
+  scrollController.animateTo(50.0 * index,
+  duration: new Duration(milliseconds: 1000), curve: Curves.easeOut);
+
   if (_controller.text.isNotEmpty) {
   play[index].setName(_controller.text);
   } else {
