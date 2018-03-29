@@ -1,4 +1,3 @@
-
 import 'package:Segnapunti/classicplayer.dart';
 import 'package:Segnapunti/util.dart' as Util;
 import 'package:flutter/material.dart';
@@ -6,7 +5,12 @@ import 'package:numberpicker/numberpicker.dart';
 
 class Classic extends StatefulWidget {
   @override
-  createState() => new ClassicState();
+  createState() {
+    play.clear();
+    play.add(new ClassicPlayer("Player 1", minValue));
+    play.add(new ClassicPlayer("Player 2", minValue));
+    return new ClassicState();
+  }
 }
 
 final List<ClassicPlayer> play = <ClassicPlayer>[
@@ -181,10 +185,10 @@ class BuildRowState extends State<BuildRow> {
   ));
   }
 
-
-  void _ensureVisible(){
+  void _ensureVisible() {
   Util.ensureVisible(context, focusNode);
   }
+
   Widget buildPickerInteger(int index) {
   return new NumberPicker.integer(
   minValue: minValue,
@@ -229,7 +233,7 @@ class BuildRowState extends State<BuildRow> {
   )
   ],
   );
-  showDialog(child: alert, context: context);
+  showDialog(child: alert, context: context, barrierDismissible: false);
   } else {
   null;
   }

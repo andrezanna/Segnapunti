@@ -10,7 +10,6 @@ final List<Player> players = <Player>[
 ];
 final List<Moves> moves = <Moves>[];
 final List<bool> ballState = new List.filled(15, true);
-final ScrollController scrollController = new ScrollController();
 
 class Biliardo extends StatefulWidget {
   @override
@@ -21,13 +20,9 @@ class Biliardo extends StatefulWidget {
     }
 
     try {
-      if (players.length == 3) {
-        players.removeLast();
-      } else if (players.length > 3) {
-        players.removeRange(2, players.length);
-      }
-      players[0].value = 0;
-      players[1].value = 0;
+      players.clear();
+      players.add(new Player("Player 1", 0));
+      players.add(new Player("Player 2", 0));
     } catch (b) {
       print(b);
     }
@@ -46,7 +41,6 @@ class BiliardoState extends State<Biliardo> {
         title: new Text('Biliardo'),
       ),
       body: new ListView(
-          controller: scrollController,
           children: <Widget>[buildBiliardo(), buildPlayers()]),
       bottomNavigationBar: new BottomNavigationBar(
         items: <BottomNavigationBarItem>[
@@ -87,6 +81,7 @@ class BiliardoState extends State<Biliardo> {
   void removePlayer(int index) {
     setState(() {
       Player player = players[index];
+      print(players);
       players.removeAt(index);
       _players--;
       List<int> indexes = new List();
@@ -100,8 +95,8 @@ class BiliardoState extends State<Biliardo> {
             title: new Text(
               "Attenzione!!",
             ),
-            content: new Text(
-                "${player
+
+            content: new Text("${player
                     .name} possiede ancora delle palle, vuoi rimetterle in gioco?"),
             actions: <Widget>[
               new MaterialButton(
@@ -112,12 +107,13 @@ class BiliardoState extends State<Biliardo> {
               ),
               new MaterialButton(
                 onPressed: () {
+                  removeMoves(indexes);
                   Navigator.of(context).pop();
                 },
                 child: new Text("NO"),
               )
             ]);
-        showDialog(context: context, child: alert);
+        showDialog(context: context, child: alert, barrierDismissible: false);
       }
     });
   }
@@ -202,6 +198,7 @@ class BiliardoState extends State<Biliardo> {
 
   Widget buildPlayers() {
   return new Container(
+
   padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 4.0),
   constraints: new BoxConstraints(
   minWidth: 0.0,
@@ -209,6 +206,8 @@ class BiliardoState extends State<Biliardo> {
   minHeight: 50.0,
   maxHeight: 100.0),
   child: new ListView.builder(
+  shrinkWrap: true,
+
   scrollDirection: Axis.horizontal,
   itemBuilder: (BuildContext context, int index) {
   return new BuildPlayer(index, removePlayer, rePaint);
@@ -241,13 +240,21 @@ class BiliardoState extends State<Biliardo> {
   void cleanBalls(List<int> indexes)
 
   {
-  for (var num in indexes) {
+  for (var num in indexes.reversed) {
   Moves move = moves[num];
   moves.removeAt(num);
   ballState[move.value - 1] = true;
   }
 
   Navigator.of(context).pop();
+  }
+
+  void removeMoves(List<int> indexes)
+
+  {
+  for (var num in indexes.reversed) {
+  moves.removeAt(num);
+  }
   }
 }
 
@@ -323,6 +330,7 @@ class BuildPlayerState extends State<BuildPlayer> {
   key: new ObjectKey(players[index].name),
   onDismissed: (DismissDirection direction) {
   setState(() {
+  print(players);
   removePlayer(index);
   });
   },
@@ -373,8 +381,6 @@ class BuildPlayerState extends State<BuildPlayer> {
   }
 
   void _ensureVisible() {
-  scrollController.animateTo(MediaQuery.of(context).size.height,
-  duration: new Duration(milliseconds: 500), curve: Curves.easeOut);
   Util.ensureVisible(context, focusNode);
   }
 
