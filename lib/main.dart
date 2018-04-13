@@ -1,3 +1,4 @@
+import 'package:Segnapunti/basket.dart';
 import 'package:Segnapunti/biliardo.dart';
 import 'package:Segnapunti/classic.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class Parent extends StatelessWidget {
         routes: <String, WidgetBuilder>{
           "/classic": (BuildContext context) => new Classic(),
           "/biliardo": (BuildContext context) => new Biliardo(),
+          "/basket": (BuildContext context) => new Basket(),
         },
         home: new Scaffold(
           appBar: new AppBar(
@@ -33,7 +35,6 @@ class Parent extends StatelessWidget {
           body: new MyApp(),
         )
     );
-
   }
 }
 
@@ -65,7 +66,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
           new MaterialButton(
-            onPressed: null,
+            onPressed: () {
+              Navigator.of(context).pushNamed('/basket');
+            },
             child: new Column(
               children: <Widget>[
                 new Image(

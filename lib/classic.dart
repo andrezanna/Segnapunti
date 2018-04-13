@@ -1,4 +1,4 @@
-import 'package:Segnapunti/classicplayer.dart';
+import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/util.dart' as Util;
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -7,15 +7,15 @@ class Classic extends StatefulWidget {
   @override
   createState() {
     play.clear();
-    play.add(new ClassicPlayer("Player 1", minValue));
-    play.add(new ClassicPlayer("Player 2", minValue));
+    play.add(new ClassicPlayer("Giocatore 1", minValue));
+    play.add(new ClassicPlayer("Giocatore 2", minValue));
     return new ClassicState();
   }
 }
 
 final List<ClassicPlayer> play = <ClassicPlayer>[
-  new ClassicPlayer("Player 1", minValue),
-  new ClassicPlayer("Player 2", minValue),
+  new ClassicPlayer("Giocatore 1", minValue),
+  new ClassicPlayer("Giocatore 2", minValue),
 ];
 
 int minValue = 0;
@@ -29,7 +29,7 @@ class ClassicState extends State<Classic> {
   int _playerName = 2;
 
   void _addPlayer() {
-    play.add(new ClassicPlayer("Player ${_playerName + 1}", minValue));
+    play.add(new ClassicPlayer("Giocatore ${_playerName + 1}", minValue));
     setState(() {
       _players++;
       _playerName++;
@@ -233,7 +233,8 @@ class BuildRowState extends State<BuildRow> {
   )
   ],
   );
-  showDialog(child: alert, context: context, barrierDismissible: false);
+  showDialog(
+  child: alert, context: context, barrierDismissible: false);
   } else {
   null;
   }
@@ -258,7 +259,7 @@ class BuildRowState extends State<BuildRow> {
   if (_controller.text.isNotEmpty) {
   play[index].setName(_controller.text);
   } else {
-  play[index].setName("Player ${index+1}");
+  play[index].setName("Giocatore ${index+1}");
   }
   }
 
@@ -349,5 +350,26 @@ class ClassicSettings extends AlertDialog {
             )),
       ]),
     );
+  }
+}
+
+class ClassicPlayer extends Player {
+
+  NumberPicker np;
+
+  ClassicPlayer(name, value) : super(name, value);
+
+  Key get key => new ObjectKey(this.hashCode);
+
+  void setValue(int value) {
+    this.value = value;
+  }
+
+  void setNumberPicker(NumberPicker p) {
+    this.np = p;
+  }
+
+  void setName(String name) {
+    this.name = name;
   }
 }

@@ -5,8 +5,8 @@ import 'package:Segnapunti/util.dart' as Util;
 import 'package:flutter/material.dart';
 
 final List<Player> players = <Player>[
-  new Player("Player 1", 0),
-  new Player("Player 2", 0)
+  new Player("Giocatore 1", 0),
+  new Player("Giocatore 2", 0)
 ];
 final List<Moves> moves = <Moves>[];
 final List<bool> ballState = new List.filled(15, true);
@@ -21,8 +21,8 @@ class Biliardo extends StatefulWidget {
 
     try {
       players.clear();
-      players.add(new Player("Player 1", 0));
-      players.add(new Player("Player 2", 0));
+      players.add(new Player("Giocatore 1", 0));
+      players.add(new Player("Giocatore 2", 0));
     } catch (b) {
       print(b);
     }
@@ -40,8 +40,7 @@ class BiliardoState extends State<Biliardo> {
       appBar: new AppBar(
         title: new Text('Biliardo'),
       ),
-      body: new ListView(
-          children: <Widget>[buildBiliardo(), buildPlayers()]),
+      body: new ListView(children: <Widget>[buildBiliardo(), buildPlayers()]),
       bottomNavigationBar: new BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           new BottomNavigationBarItem(
@@ -71,7 +70,7 @@ class BiliardoState extends State<Biliardo> {
   }
 
   void _addPlayer() {
-    players.add(new Player("Player ${_playerName + 1}", 0));
+    players.add(new Player("Giocatore ${_playerName + 1}", 0));
     setState(() {
       _players++;
       _playerName++;
@@ -81,7 +80,6 @@ class BiliardoState extends State<Biliardo> {
   void removePlayer(int index) {
     setState(() {
       Player player = players[index];
-      print(players);
       players.removeAt(index);
       _players--;
       List<int> indexes = new List();
@@ -95,7 +93,6 @@ class BiliardoState extends State<Biliardo> {
             title: new Text(
               "Attenzione!!",
             ),
-
             content: new Text("${player
                     .name} possiede ancora delle palle, vuoi rimetterle in gioco?"),
             actions: <Widget>[
@@ -197,17 +194,16 @@ class BiliardoState extends State<Biliardo> {
   }
 
   Widget buildPlayers() {
+  double width=MediaQuery.of(context).size.width;
   return new Container(
-
   padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 4.0),
   constraints: new BoxConstraints(
   minWidth: 0.0,
-  maxWidth: double.INFINITY,
+  maxWidth: width,
   minHeight: 50.0,
   maxHeight: 100.0),
   child: new ListView.builder(
   shrinkWrap: true,
-
   scrollDirection: Axis.horizontal,
   itemBuilder: (BuildContext context, int index) {
   return new BuildPlayer(index, removePlayer, rePaint);
@@ -330,7 +326,6 @@ class BuildPlayerState extends State<BuildPlayer> {
   key: new ObjectKey(players[index].name),
   onDismissed: (DismissDirection direction) {
   setState(() {
-  print(players);
   removePlayer(index);
   });
   },
@@ -339,7 +334,7 @@ class BuildPlayerState extends State<BuildPlayer> {
   }, builder: (BuildContext context, List<BallMove> accepted,
   List<dynamic> rejected) {
   return new Container(
-  width: Math.max((width - 32.0) / players.length, 90.0),
+  width: Math.max((width - 32.0) / players.length, 110.0),
   decoration: new BoxDecoration(
   color: accepted.isEmpty ? null : Colors.grey.shade200,
   border: new Border.all(
@@ -388,7 +383,7 @@ class BuildPlayerState extends State<BuildPlayer> {
   if (_controller.text.isNotEmpty) {
   players[index].setName(_controller.text);
   } else {
-  players[index].setName("Player ${index+1}");
+  players[index].setName("Giocatore ${index+1}");
   }
   }
 }
