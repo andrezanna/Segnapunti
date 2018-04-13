@@ -89,12 +89,13 @@ class BiliardoState extends State<Biliardo> {
         }
       }
       if (indexes.length > 0) {
-        var alert = new AlertDialog(
+        showDialog(context: context, builder: (context) =>
+        new AlertDialog(
             title: new Text(
               "Attenzione!!",
             ),
             content: new Text("${player
-                    .name} possiede ancora delle palle, vuoi rimetterle in gioco?"),
+                .name} possiede ancora delle palle, vuoi rimetterle in gioco?"),
             actions: <Widget>[
               new MaterialButton(
                 onPressed: () {
@@ -109,8 +110,7 @@ class BiliardoState extends State<Biliardo> {
                 },
                 child: new Text("NO"),
               )
-            ]);
-        showDialog(context: context, child: alert, barrierDismissible: false);
+            ]), barrierDismissible: false);
       }
     });
   }

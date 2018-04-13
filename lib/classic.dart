@@ -46,9 +46,9 @@ class ClassicState extends State<Classic> {
               onPressed: null,
               child: new MaterialButton(
                 onPressed: () {
-                  AlertDialog alert = new ClassicSettings();
-
-                  showDialog(child: alert, context: context);
+                  showDialog(
+                      builder: (context) => new ClassicSettings(),
+                      context: context);
                 },
                 child: new Text(
                   "IMPOSTAZIONI",
@@ -206,7 +206,8 @@ class BuildRowState extends State<BuildRow> {
   play[index].value = newValue;
   if (play[index].value == maxValue && !maxReached) {
   maxReached = true;
-  AlertDialog alert = new AlertDialog(
+  showDialog(
+  builder: (context) => new AlertDialog(
   title: new Text("Vincitore!!"),
   content: new Text("${play[index]
       .name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
@@ -232,9 +233,9 @@ class BuildRowState extends State<BuildRow> {
   ),
   )
   ],
-  );
-  showDialog(
-  child: alert, context: context, barrierDismissible: false);
+  ),
+  context: context,
+  barrierDismissible: false);
   } else {
   null;
   }
@@ -284,21 +285,23 @@ class ClassicSettings extends AlertDialog {
         minValue = newValue;
       else if (!(shown)) {
         shown = true;
-        AlertDialog errorDialog = new AlertDialog(
-          title: new Text("Valore non valido"),
-          content:
-          new Text("Il valore minimo non può essere maggiore del massimo"),
-          actions: <Widget>[
-            new MaterialButton(
-              onPressed: () {
-                Navigator.pop(context);
-                shown = false;
-              },
-              child: new Icon(Icons.close),
-            )
-          ],
-        );
-        showDialog(context: context, child: errorDialog);
+        showDialog(
+            context: context,
+            builder: (context) =>
+            new AlertDialog(
+              title: new Text("Valore non valido"),
+              content: new Text(
+                  "Il valore minimo non può essere maggiore del massimo"),
+              actions: <Widget>[
+                new MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    shown = false;
+                  },
+                  child: new Icon(Icons.close),
+                )
+              ],
+            ));
       }
     });
     _maxcontroller.addListener(() {
@@ -307,21 +310,23 @@ class ClassicSettings extends AlertDialog {
         minValue = newValue;
       else if (!(shown)) {
         shown = true;
-        AlertDialog errorDialog = new AlertDialog(
-          title: new Text("Valore non valido"),
-          content:
-          new Text("Il valore massimo non può essere minore del minimo"),
-          actions: <Widget>[
-            new MaterialButton(
-              onPressed: () {
-                Navigator.pop(context);
-                shown = false;
-              },
-              child: new Icon(Icons.close),
-            )
-          ],
-        );
-        showDialog(context: context, child: errorDialog);
+        showDialog(
+            context: context,
+            builder: (context) =>
+            new AlertDialog(
+              title: new Text("Valore non valido"),
+              content: new Text(
+                  "Il valore massimo non può essere minore del minimo"),
+              actions: <Widget>[
+                new MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    shown = false;
+                  },
+                  child: new Icon(Icons.close),
+                )
+              ],
+            ));
       }
     });
     return new Scaffold(
@@ -354,7 +359,6 @@ class ClassicSettings extends AlertDialog {
 }
 
 class ClassicPlayer extends Player {
-
   NumberPicker np;
 
   ClassicPlayer(name, value) : super(name, value);
