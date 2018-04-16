@@ -89,28 +89,31 @@ class BiliardoState extends State<Biliardo> {
         }
       }
       if (indexes.length > 0) {
-        showDialog(context: context, builder: (context) =>
-        new AlertDialog(
-            title: new Text(
-              "Attenzione!!",
-            ),
-            content: new Text("${player
+        showDialog(
+            context: context,
+            builder: (context) =>
+            new AlertDialog(
+                title: new Text(
+                  "Attenzione!!",
+                ),
+                content: new Text("${player
                 .name} possiede ancora delle palle, vuoi rimetterle in gioco?"),
-            actions: <Widget>[
-              new MaterialButton(
-                onPressed: () {
-                  cleanBalls(indexes);
-                },
-                child: new Text("SI"),
-              ),
-              new MaterialButton(
-                onPressed: () {
-                  removeMoves(indexes);
-                  Navigator.of(context).pop();
-                },
-                child: new Text("NO"),
-              )
-            ]), barrierDismissible: false);
+                actions: <Widget>[
+                  new MaterialButton(
+                    onPressed: () {
+                      cleanBalls(indexes);
+                    },
+                    child: new Text("SI"),
+                  ),
+                  new MaterialButton(
+                    onPressed: () {
+                      removeMoves(indexes);
+                      Navigator.of(context).pop();
+                    },
+                    child: new Text("NO"),
+                  )
+                ]),
+            barrierDismissible: false);
       }
     });
   }
@@ -183,30 +186,60 @@ class BiliardoState extends State<Biliardo> {
   '/images/p10.png',
   Colors.blue,
   ),
-  new MovableBall(11, '/images/p11.png', Colors.red),
-  new MovableBall(12, '/images/p12.png', Colors.purple),
-  new MovableBall(13, '/images/p13.png', Colors.orange),
-  new MovableBall(14, '/images/p14.png', Colors.green),
-  new MovableBall(15, '/images/p15.png', Colors.brown),
+  new MovableBall(
+  11,
+  '/images/p11.png',
+  Colors.red,
+  ),
+  new MovableBall(
+  12,
+  '/images/p12.png',
+  Colors.purple,
+  ),
+  new MovableBall(
+  13,
+  '/images/p13.png',
+  Colors.orange,
+  ),
+  new MovableBall(
+  14,
+  '/images/p14.png',
+  Colors.green,
+  ),
+  new MovableBall(
+  15,
+  '/images/p15.png',
+  Colors.brown,
+  ),
   ],
   ),
   );
   }
 
   Widget buildPlayers() {
-  double width=MediaQuery.of(context).size.width;
+  double width = MediaQuery.of(context).size.width;
   return new Container(
-  padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 4.0),
+  padding: const EdgeInsets.fromLTRB(
+  16.0,
+  4.0,
+  16.0,
+  4.0,
+  ),
   constraints: new BoxConstraints(
   minWidth: 0.0,
   maxWidth: width,
   minHeight: 50.0,
-  maxHeight: 100.0),
+  maxHeight: 100.0,
+  ),
   child: new ListView.builder(
   shrinkWrap: true,
   scrollDirection: Axis.horizontal,
   itemBuilder: (BuildContext context, int index) {
-  return new BuildPlayer(index, removePlayer, rePaint);
+  return new BuildPlayer(
+  index,
+  removePlayer,
+  rePaint,
+  );
   },
   itemCount: _players,
   ),
@@ -241,7 +274,7 @@ class BiliardoState extends State<Biliardo> {
   moves.removeAt(num);
   ballState[move.value - 1] = true;
   }
-
+  setState((){});
   Navigator.of(context).pop();
   }
 
@@ -372,6 +405,7 @@ class BuildPlayerState extends State<BuildPlayer> {
   players[index].value += value;
   ballState[value - 1] = false;
   moves.add(new Moves(value, index));
+  onChanged(null);
   });
   }
 
@@ -397,7 +431,8 @@ class MovableBall extends StatefulWidget {
 
   @override
   createState() =>
-      new MovableBallState(value: value, image: image, color: color);
+      new MovableBallState(
+        value: value, image: image, color: color,);
 }
 
 class MovableBallState extends State<MovableBall> {

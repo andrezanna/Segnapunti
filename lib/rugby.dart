@@ -5,24 +5,23 @@ import 'package:Segnapunti/timertextformatter.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
 
-int periodLength = 10;
-int teamFoulThreshold = 4;
-int periodNumber = 4;
-
+int periodLength = 40;
+int periodNumber = 2;
 TimerTextState timerSuper;
 int inPeriod = 0;
 Stopwatch stopwatch = new Stopwatch();
 
-//TODO - Period Number
+//TODO - period Number
 
-class Basket extends StatefulWidget {
+class Rugby extends StatefulWidget {
   @override
-  createState() => new BasketState();
+  createState() => new RugbyState();
 }
 
-class BasketState extends State<Basket> {
-  BasketTeam team1 = new BasketTeam("Casa", 0);
-  BasketTeam team2 = new BasketTeam("Trasferta", 0);
+class RugbyState extends State<Rugby> {
+  Player team1 = new Player("Casa", 0);
+  Player team2 = new Player("Trasferta", 0);
+
   final List<Scores> scores = new List();
   Scores lastPeriod = new Scores(0, 0);
 
@@ -36,8 +35,8 @@ class BasketState extends State<Basket> {
     List<Widget> actions = <Widget>[
       new MaterialButton(
         onPressed: () {
-          Navigator.of(context).push(new MaterialPageRoute(
-              builder: (context) => new BasketSettings()));
+          Navigator.of(context).push(
+              new MaterialPageRoute(builder: (context) => new RugbySettings()));
         },
         child: new Text(
           "IMPOSTAZIONI",
@@ -60,10 +59,10 @@ class BasketState extends State<Basket> {
     }
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Basket'),
+        title: new Text('Rugby'),
         actions: actions,
       ),
-      body: _buildBasket(),
+      body: _buildRugby(),
     );
   }
 
@@ -74,27 +73,18 @@ class BasketState extends State<Basket> {
   (void a)
 
   {
-  if(scores.isEmpty)
-  for (int i=0;i<periodNumber;i++)
-  scores.add(new Scores(0, 0));
   setState(() {
   scores[inPeriod].setScores(
   team1.value - lastPeriod.team1, team2.value - lastPeriod.team2);
   lastPeriod.setScores(team1.value, team2.value);
-  if (team1.value == team2.value && inPeriod >= periodNumber-1) {
-  scores.add(new Scores(0, 0));
-  }
-  team1.fouls = 0;
-  team2.fouls = 0;
   inPeriod++;
-
   });
   }
 
-  Widget _buildBasket()
+  Widget _buildRugby()
 
   {
-  TimerText timerText = new TimerText(onTimeEnd);
+  TimerText timerText = new TimerText();
   return new Flex(
   direction: Axis.vertical,
   children: <Widget>[
@@ -123,9 +113,9 @@ class BasketState extends State<Basket> {
   crossAxisAlignment: CrossAxisAlignment.center,
   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
   children: <Widget>[
-  new Expanded(child: new BasketTeamScore(team1)),
+  new Expanded(child: new RugbyTeamScore(team1)),
   new TeamScorePeriod(scores),
-  new Expanded(child: new BasketTeamScore(team2)),
+  new Expanded(child: new RugbyTeamScore(team2)),
   ],
   ),
   ),
@@ -177,26 +167,26 @@ class BasketState extends State<Basket> {
   }
   team1.value = 0;
   team2.value = 0;
-  team1.fouls = 0;
-  team2.fouls = 0;
+
   inPeriod = 0;
   });
   }
 }
 
+class RugbyTeamScore extends StatefulWidget {
+  RugbyTeamScore(this.team);
 
-class BasketTeamScore extends StatefulWidget {
-  BasketTeamScore(this.team);
+  final Player team;
 
-  final BasketTeam team;
   @override
-  createState() => new BasketTeamScoreState(team);
+  createState() => new RugbyTeamScoreState(team);
 }
 
-class BasketTeamScoreState extends State<BasketTeamScore> {
-  BasketTeamScoreState(this.team);
+class RugbyTeamScoreState extends State<RugbyTeamScore> {
+  RugbyTeamScoreState(this.team);
 
-  final BasketTeam team;
+  final Player team;
+
   @override
   Widget build(BuildContext context) {
     return new Column(
@@ -219,11 +209,6 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                   ),
                   textAlign: TextAlign.right,
                 ),
-                new Icon(
-                  (team.fouls >= teamFoulThreshold) ? Icons.brightness_1 : null,
-                  color: Colors.red,
-                  size: 10.0,
-                ),
               ],
             ),
           ),
@@ -239,14 +224,13 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
         new Expanded(
           child: new MaterialButton(
               onPressed: () {
-                if (stopwatch.elapsedMilliseconds > 0 &&
-                    stopwatch.elapsedMilliseconds < periodLength * 1000 * 60)
+                if (stopwatch.elapsedMilliseconds > 0 && stopwatch.isRunning)
                   setState(() {
-                    team.value += 1;
+                    team.value += 5;
                   });
               },
               child: new Text(
-                "+1",
+                "+5",
                 style: new TextStyle(fontSize: 25.0),
               )),
         ),
@@ -275,18 +259,6 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                   "+3",
                   style: new TextStyle(fontSize: 25.0),
                 ))),
-        new Expanded(
-          child: new MaterialButton(
-              onPressed: () {
-                setState(() {
-                  team.fouls += 1;
-                });
-              },
-              child: new Text(
-                "FALLO",
-                style: new TextStyle(fontSize: 25.0),
-              )),
-        ),
       ],
     );
   }
@@ -294,7 +266,9 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
 
 class TeamScorePeriod extends StatefulWidget {
   TeamScorePeriod(this.scores);
+
   final List<Scores> scores;
+
   @override
   createState() {
     return new TeamScorePeriodState(scores);
@@ -303,7 +277,9 @@ class TeamScorePeriod extends StatefulWidget {
 
 class TeamScorePeriodState extends State<TeamScorePeriod> {
   TeamScorePeriodState(this.scores);
+
   final List<Scores> scores;
+
   @override
   Widget build(BuildContext context) {
     return new Container(
@@ -335,8 +311,7 @@ class TeamScorePeriodState extends State<TeamScorePeriod> {
                       constraints:
                       new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
                       child: new Text(
-                        (index > periodNumber - 1) ? " TS${index -
-                            periodNumber - 1} " : " ${index + 1} ",
+                        " ${index + 1} ",
                         style: new TextStyle(color: Colors.red, fontSize: 20.0),
                         textAlign: TextAlign.center,
                       ),
@@ -358,9 +333,8 @@ class TeamScorePeriodState extends State<TeamScorePeriod> {
   }
 }
 
-class BasketSettings extends StatelessWidget {
+class RugbySettings extends StatelessWidget {
   final TextEditingController _periodLength = new TextEditingController();
-  final TextEditingController _teamFoul = new TextEditingController();
   final TextEditingController _periodNumber = new TextEditingController();
 
   @override
@@ -381,7 +355,7 @@ class BasketSettings extends StatelessWidget {
               new AlertDialog(
                 title: new Text("Valore non valido"),
                 content: new Text(
-                    "La durata del quarto deve essere maggiore di 0"),
+                    "La durata del tempo deve essere maggiore di 0"),
                 actions: <Widget>[
                   new MaterialButton(
                     onPressed: () {
@@ -423,39 +397,11 @@ class BasketSettings extends StatelessWidget {
         }
       }
     });
-    _teamFoul.addListener(() {
-      if (_teamFoul.text.isNotEmpty) {
-        int newValue = int.parse(_teamFoul.text.toString());
-        if (newValue >= 0)
-          teamFoulThreshold = newValue;
-        else if (!(shown)) {
-          shown = true;
-          showDialog(
-              context: context,
-              builder: (context) =>
-              new AlertDialog(
-                title: new Text("Valore non valido"),
-                content: new Text(
-                    "Il limite di falli per il bonus deve essere maggiore di 0"),
-                actions: <Widget>[
-                  new MaterialButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      shown = false;
-                    },
-                    child: new Icon(Icons.close),
-                  )
-                ],
-              ));
-          shown = false;
-        }
-      }
-    });
     return new Scaffold(
       appBar: new AppBar(),
       body: new Column(children: <Widget>[
         new ListTile(
-            trailing: new Text("Durata Quarto"),
+            trailing: new Text("Durata Tempo"),
             title: new TextField(
               keyboardType: TextInputType.number,
               decoration: new InputDecoration(
@@ -472,51 +418,18 @@ class BasketSettings extends StatelessWidget {
               ),
               controller: _periodNumber,
             )),
-        new ListTile(
-            trailing: new Text("Falli per bonus"),
-            title: new TextField(
-              keyboardType: TextInputType.number,
-              decoration: new InputDecoration(
-                hintText: teamFoulThreshold.toString(),
-              ),
-              controller: _teamFoul,
-            )),
       ]),
     );
-  }
-
-}
-
-class BasketTeam extends Player {
-  int fouls = 0;
-  BasketTeam(name, value) : super(name, value);
-
-  void foul() {
-    fouls++;
   }
 }
 
 class TimerText extends StatefulWidget {
-  TimerText(this.onTimeEnd);
+  TimerText();
 
-  final ValueChanged
-
-  <
-
-  void
-
-  >
-
-  onTimeEnd
-
-  ;
-
-  TimerTextState createState()
-
-  {
-  TimerTextState timerTextState = new TimerTextState(onTimeEnd);
-  timerSuper = timerTextState;
-  return timerTextState;
+  TimerTextState createState() {
+    TimerTextState timerTextState = new TimerTextState();
+    timerSuper = timerTextState;
+    return timerTextState;
   }
 }
 
@@ -526,98 +439,52 @@ class TimerTextState extends State<TimerText> {
   bool cb = false;
   String text;
 
-  final ValueChanged
-
-  <
-
-  void
-
-  >
-
-  onTimeEnd
-
-  ;
-  int qLength = periodLength;
-
-  TimerTextState(this.
-
-  onTimeEnd) {
-  startStop(periodLength);
+  TimerTextState() {
+    startStop(periodLength);
   }
 
   @override
   void dispose() {
-  if (timer != null) timer.cancel();
-  stopwatch.stop();
-  super.dispose();
+    if (timer != null) timer.cancel();
+    stopwatch.stop();
+    super.dispose();
   }
 
   void callback(Timer timer) {
-  if (stopwatch.isRunning) {
-  if (stopwatch.elapsedMilliseconds >= (qLength) * 1000 * 60) {
-  timer.cancel();
-  stopwatch.stop();
-  onTimeEnd(null);
-  setState(() {
-  text = TimerTextFormatter.format(0, true);
-  });
-  } else
-  if (stopwatch.elapsedMilliseconds >= (qLength - 1) * 1000 * 60 &&
-  !cb) {
-  timer = new Timer.periodic(new Duration(milliseconds: 30), callback);
-  cb = true;
-  } else
-  if (stopwatch.elapsedMilliseconds < (qLength - 1) * 1000 * 60 &&
-  cb) {
-  timer = new Timer.periodic(new Duration(milliseconds: 1000), callback);
-  cb = false;
-  }
-  setState(() {});
-  }
+    if (stopwatch.isRunning) {
+      setState(() {});
+    }
   }
 
   void startStop(int periodLength) {
-  if (inPeriod > periodNumber-1)
-  qLength = (periodLength / 2) as int;
-  else
-  qLength = periodLength;
-  if (!running && stopwatch.elapsedMilliseconds < (qLength) * 1000 * 60) {
-  stopwatch.start();
+    if (!running &&
+        stopwatch.elapsedMilliseconds < (periodLength) * 1000 * 60) {
+      stopwatch.start();
 
-  running = true;
-  if (stopwatch.elapsedMilliseconds >= (qLength - 1) * 1000 * 60) {
-  timer = new Timer.periodic(new Duration(milliseconds: 100), callback);
-  } else {
-  timer = new Timer.periodic(new Duration(milliseconds: 1000), callback);
-  }
-  } else
-  if (running && timer != null) {
-  stopwatch.stop();
-  running = false;
-  timer.cancel();
-  } else {
-  running = false;
-  stopwatch.stop();
-  }
+      running = true;
+
+      timer = new Timer.periodic(new Duration(milliseconds: 1000), callback);
+    } else if (running && timer != null) {
+      stopwatch.stop();
+      running = false;
+      timer.cancel();
+    } else {
+      running = false;
+      stopwatch.stop();
+    }
   }
 
   void reset() {
-  setState(() {
-  stopwatch.reset();
-  });
+    setState(() {
+      stopwatch.reset();
+    });
   }
 
   @override
-  Widget build(BuildContext context)
-
-  {
-  final TextStyle timerTextStyle = const TextStyle(
-  fontSize: 60.0, fontFamily: "Open Sans", color: Colors.red);
-  text = TimerTextFormatter.format(
-  (periodLength * 1000 * 60) - stopwatch.elapsedMilliseconds,
-  stopwatch.elapsedMilliseconds > (periodLength - 1) * 1000 * 60);
-  return new Text(text, style: timerTextStyle);
+  Widget build(BuildContext context) {
+    final TextStyle timerTextStyle = const TextStyle(
+        fontSize: 60.0, fontFamily: "Open Sans", color: Colors.red);
+    text = TimerTextFormatter.format(stopwatch.elapsedMilliseconds);
+    return new Text(text, style: timerTextStyle);
   }
 }
-
-

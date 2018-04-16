@@ -38,3 +38,15 @@ Future<Null> ensureVisible(BuildContext context, FocusNode focusNode) async {
     curve: Curves.easeIn,
   );
 }
+
+class Scores {
+  int team1;
+  int team2;
+
+  Scores(this.team1, this.team2);
+
+  void setScores(int team1, int team2) {
+    this.team1 = team1;
+    this.team2 = team2;
+  }
+}

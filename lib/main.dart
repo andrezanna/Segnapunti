@@ -1,6 +1,7 @@
 import 'package:Segnapunti/basket.dart';
 import 'package:Segnapunti/biliardo.dart';
 import 'package:Segnapunti/classic.dart';
+import 'package:Segnapunti/rugby.dart';
 import 'package:flutter/material.dart';
 
 /*Parte importante, creo un layout padre
@@ -23,6 +24,7 @@ class Parent extends StatelessWidget {
           "/classic": (BuildContext context) => new Classic(),
           "/biliardo": (BuildContext context) => new Biliardo(),
           "/basket": (BuildContext context) => new Basket(),
+          "/rugby": (BuildContext context) => new Rugby(),
         },
         home: new Scaffold(
           appBar: new AppBar(
@@ -107,8 +109,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
           new MaterialButton(
-            onPressed: null,
-            child: new Column(
+            onPressed: () {
+              Navigator.of(context).pushNamed('/rugby');
+            }, child: new Column(
               children: <Widget>[
                 new Image(
                   image: new AssetImage('/images/rugby.png'),
