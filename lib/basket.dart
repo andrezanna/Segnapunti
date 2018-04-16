@@ -13,7 +13,7 @@ TimerTextState timerSuper;
 int inPeriod = 0;
 Stopwatch stopwatch = new Stopwatch();
 
-//TODO - Period Number
+//TODO - Timer Unificato
 
 class Basket extends StatefulWidget {
   @override

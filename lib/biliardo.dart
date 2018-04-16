@@ -274,7 +274,7 @@ class BiliardoState extends State<Biliardo> {
   moves.removeAt(num);
   ballState[move.value - 1] = true;
   }
-  setState((){});
+  setState(() {});
   Navigator.of(context).pop();
   }
 
@@ -432,7 +432,10 @@ class MovableBall extends StatefulWidget {
   @override
   createState() =>
       new MovableBallState(
-        value: value, image: image, color: color,);
+        value: value,
+        image: image,
+        color: color,
+      );
 }
 
 class MovableBallState extends State<MovableBall> {

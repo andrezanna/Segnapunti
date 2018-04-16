@@ -1,8 +1,11 @@
 import 'package:Segnapunti/basket.dart';
 import 'package:Segnapunti/biliardo.dart';
 import 'package:Segnapunti/classic.dart';
+import 'package:Segnapunti/pallavolo.dart';
 import 'package:Segnapunti/rugby.dart';
+import 'package:Segnapunti/tennis.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /*Parte importante, creo un layout padre
 //se no ho problemi col navigator.push
@@ -14,10 +17,12 @@ void main() => runApp(new Parent());
 class Parent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return new MaterialApp(
         title: 'Segnapunti',
         theme: new ThemeData(
           primaryColor: Colors.blue,
+          splashColor: Colors.blue,
         ),
         //passaggio importante, semplificano le chiamate per il navigator.push
         routes: <String, WidgetBuilder>{
@@ -25,6 +30,8 @@ class Parent extends StatelessWidget {
           "/biliardo": (BuildContext context) => new Biliardo(),
           "/basket": (BuildContext context) => new Basket(),
           "/rugby": (BuildContext context) => new Rugby(),
+          "/tennis": (BuildContext context) => new Tennis(),
+          "/volley": (BuildContext context) => new Volley(),
         },
         home: new Scaffold(
           appBar: new AppBar(
@@ -35,8 +42,7 @@ class Parent extends StatelessWidget {
             backgroundColor: Colors.blue,
           ),
           body: new MyApp(),
-        )
-    );
+        ));
   }
 }
 
@@ -83,7 +89,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
           new MaterialButton(
-            onPressed: null,
+            onPressed: () {
+              Navigator.of(context).pushNamed('/volley');
+            },
             child: new Column(
               children: <Widget>[
                 new Image(
@@ -96,7 +104,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
           new MaterialButton(
-            onPressed: null,
+            onPressed: () {
+              Navigator.of(context).pushNamed('/tennis');
+            },
             child: new Column(
               children: <Widget>[
                 new Image(
@@ -111,7 +121,8 @@ class MyApp extends StatelessWidget {
           new MaterialButton(
             onPressed: () {
               Navigator.of(context).pushNamed('/rugby');
-            }, child: new Column(
+            },
+            child: new Column(
               children: <Widget>[
                 new Image(
                   image: new AssetImage('/images/rugby.png'),
