@@ -1,10 +1,16 @@
+import 'dart:core';
+
 import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
 
+
 int periodWin = 6;
 int periodNumber = 3;
 int inPeriod = 0;
+bool tieBreak = true;
+bool inTieBreak = false;
+bool matchWon = false;
 
 class Tennis extends StatefulWidget {
   @override
@@ -12,11 +18,11 @@ class Tennis extends StatefulWidget {
 }
 
 class TennisState extends State<Tennis> {
-  Player player1 = new Player("Giocatore 1", 0);
-  Player player2 = new Player("Giocatore 2", 0);
-
+  TennisPlayer player1 = new TennisPlayer("Giocatore 1", 0, true);
+  TennisPlayer player2 = new TennisPlayer("Giocatore 2", 0);
   final List<Scores> scores = new List();
   Scores lastPeriod = new Scores(0, 0);
+
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +30,14 @@ class TennisState extends State<Tennis> {
       scores.clear();
       for (int i = 0; i < periodNumber; i++)
         scores.add(new Scores(0, 0));
+      inPeriod = 0;
+      player1.value = 0;
+      player2.value = 0;
+      player1.service = true;
+      player2.service = false;
+      player1.setWon = 0;
+      player2.setWon = 0;
+      matchWon = false;
     }
     List<Widget> actions = <Widget>[
       new MaterialButton(
@@ -37,11 +51,11 @@ class TennisState extends State<Tennis> {
         ),
       ),
     ];
-    if (inPeriod == scores.length) {
+    if (matchWon) {
       actions.add(
         new MaterialButton(
           onPressed: () {
-            nuovaPartita();
+            newMatch();
           },
           child: new Text(
             "NUOVA",
@@ -63,58 +77,172 @@ class TennisState extends State<Tennis> {
     return new Flex(
       direction: Axis.vertical,
       children: <Widget>[
-        new TennisScorePeriod(scores),
+        Padding(
+          padding: const EdgeInsets.all(36.0),
+          child: new TennisScorePeriod(scores, player1, player2),
+        ),
         new Expanded(
           child: new Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              new Expanded(child: new TennisScore(player1)),
-              new Expanded(child: new TennisScore(player2)),
+              new Expanded(child: new TennisScore(player1, pointScored)),
+              new Expanded(child: new TennisScore(player2, pointScored)),
             ],
           ),
         ),
       ],
     );
   }
+
+  void pointScored(TennisPlayer player) {
+    if (inPeriod == scores.length || matchWon) {
+      matchWon = true;
+    } else {
+      TennisPlayer other = (player.name == player1.name) ? player2 : player1;
+      bool setWin = false;
+      if (inTieBreak) {
+        if (player.value >= other.value + 2 && player.value >= 7) {
+          setWin = true;
+        } else if ((player.value + other.value) % 2 != 0) {
+          setState(() {
+            player.service = !player.service;
+            other.service = !other.service;
+          });
+        }
+      } else if ((player.value == 4 && other.value < 3) || player.value == 5) {
+        setWin = true;
+      } else if (player.value == 4 && other.value == 4) {
+        setState(() {
+          player1.value = 3;
+          player2.value = 3;
+        });
+      }
+      if (setWin) {
+        setState(() {
+          player1.value = 0;
+          player2.value = 0;
+          player.service = !player.service;
+          other.service = !other.service;
+
+          if (player.name == player1.name) {
+            scores[inPeriod].team1 += 1;
+
+            if ((scores[inPeriod].team1 >= periodWin &&
+                scores[inPeriod].team1 >= scores[inPeriod].team2 + 2) ||
+                inTieBreak) {
+              inPeriod += 1;
+              print("${player.setWon + 1} ${(periodNumber / 2).ceil()}");
+              if (++player.setWon >= (periodNumber / 2).ceil()) {
+                matchWon = true;
+              }
+            }
+          } else {
+            scores[inPeriod].team2 += 1;
+            if ((scores[inPeriod].team2 >= periodWin &&
+                scores[inPeriod].team2 >= scores[inPeriod].team1 + 2) ||
+                inTieBreak) {
+              inPeriod += 1;
+              print("${player.setWon + 1} ${(periodNumber / 2).ceil()}");
+
+              if (++player.setWon >= (periodNumber / 2).ceil()) {
+                matchWon = true;
+              }
+            }
+          }
+          inTieBreak = false;
+
+          if (scores[inPeriod].team2 == periodWin &&
+              scores[inPeriod].team1 == periodWin &&
+              tieBreak) inTieBreak = true;
+        });
+      }
+    }
+    if (matchWon) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) =>
+        new AlertDialog(
+          title: new Text("La partita è stata vinta"),
+          content: new Text("Vuoi fare una nuova partita?"),
+          actions: <Widget>[
+            new CloseButton(),
+            new MaterialButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                newMatch();
+              },
+              child: new Icon(Icons.done),
+            )
+          ],
+        ),
+      );
+    }
+  }
+
+  void newMatch() {
+    setState(() {
+      inPeriod = 0;
+      player1.value = 0;
+      player2.value = 0;
+      player1.service = true;
+      player2.service = false;
+      player1.setWon = 0;
+      player2.setWon = 0;
+      scores.clear();
+      for (int i = 0; i < periodNumber; i++)
+        scores.add(new Scores(0, 0));
+      matchWon = false;
+    });
+  }
 }
 
 class TennisScore extends StatefulWidget {
-  TennisScore(this.team);
+  TennisScore(this.team, this.pointScored);
 
-  final Player team;
+  final ValueChanged<TennisPlayer> pointScored;
+  final TennisPlayer team;
 
   @override
-  createState() => new TennisScoreState(team);
+  createState() => new TennisScoreState(team, pointScored);
 }
 
 class TennisScoreState extends State<TennisScore> {
-  TennisScoreState(this.team);
+  TennisScoreState(this.team, this.pointScored);
 
-  final Player team;
+  final ValueChanged<TennisPlayer> pointScored;
+
+  final TennisPlayer team;
 
   @override
   Widget build(BuildContext context) {
-    return new Column(
+    List<String> points = ["0", "15", "30", "40", "ADV"];
+    return new Flex(
+      direction: Axis.vertical,
       children: <Widget>[
         new Expanded(
           child: new MaterialButton(
             onPressed: () {
               setState(() {
-                team.value -= 1;
+                if (team.value > 0 && !matchWon) team.value -= 1;
               });
             },
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Text(
-                  team.value.toString(),
+                  (inTieBreak) ? team.value.toString() : points[team.value],
                   style: new TextStyle(
                     color: Colors.red,
                     fontSize: 40.0,
                   ),
                   textAlign: TextAlign.right,
+                ),
+                new Icon(
+                  (team.service) ? Icons.brightness_1 : null,
+                  color: Colors.red,
+                  size: 10.0,
                 ),
               ],
             ),
@@ -132,112 +260,122 @@ class TennisScoreState extends State<TennisScore> {
           child: new MaterialButton(
               onPressed: () {
                 setState(() {
-                  team.value += 5;
+                  if (!matchWon)
+                    team.value += 1;
                 });
+                pointScored(team);
               },
               child: new Text(
-                "+5",
+                "Punto",
                 style: new TextStyle(fontSize: 25.0),
               )),
         ),
-        new Expanded(
-          child: new MaterialButton(
-              onPressed: () {
-                setState(() {
-                  team.value += 2;
-                });
-              },
-              child: new Text(
-                "+2",
-                style: new TextStyle(fontSize: 25.0),
-              )),
-        ),
-        new Expanded(
-            child: new MaterialButton(
-                onPressed: () {
-                  setState(() {
-                    team.value += 3;
-                  });
-                },
-                child: new Text(
-                  "+3",
-                  style: new TextStyle(fontSize: 25.0),
-                ))),
       ],
     );
   }
 }
 
 class TennisScorePeriod extends StatefulWidget {
-  TennisScorePeriod(this.scores);
+  final TennisPlayer team1;
+  final TennisPlayer team2;
+
+  TennisScorePeriod(this.scores, this.team1, this.team2);
 
   final List<Scores> scores;
 
   @override
   createState() {
-    return new TennisScorePeriodState(scores);
+    return new TennisScorePeriodState(scores, team1, team2);
   }
 }
 
 class TennisScorePeriodState extends State<TennisScorePeriod> {
-  TennisScorePeriodState(this.scores);
+  TennisScorePeriodState(this.scores, this.team1, this.team2);
 
+  final TennisPlayer team1;
+  final TennisPlayer team2;
   final List<Scores> scores;
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-        decoration: new BoxDecoration(
-          border: new Border.all(
-            width: 2.0,
-            color: Colors.black,
-          ),
+    List<Widget> scoresTeam1 = <Widget>[];
+    for (int i = 0; i < scores.length; i++)
+      scoresTeam1.add(new Expanded(
+        child: new Text(
+          scores[i].team1.toString(),
+          textAlign: TextAlign.center,
+          style: new TextStyle(fontSize: 20.0),
         ),
-        constraints: new BoxConstraints(minWidth: 80.0, maxWidth: 120.0),
-        child: new ListView.builder(
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          itemBuilder: (BuildContext context, int index) {
-            return new Container(
-                child: new Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    new Container(
-                      constraints:
-                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
-                      child: new Text(
-                        scores[index].team1.toString(),
-                        textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 20.0),
-                      ),
-                    ),
-                    new Container(
-                      constraints:
-                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
-                      child: new Text(
-                        " ${index + 1} ",
-                        style: new TextStyle(color: Colors.red, fontSize: 20.0),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    new Container(
-                      constraints:
-                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
-                      child: new Text(
-                        scores[index].team2.toString(),
-                        textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 20.0),
-                      ),
-                    ),
-                  ],
-                ));
-          },
-          itemCount: scores.length,
-        ));
+      ));
+    List<Widget> scoresTeam2 = <Widget>[];
+    for (int i = 0; i < scores.length; i++)
+      scoresTeam2.add(new Expanded(
+        child: new Text(
+          scores[i].team2.toString(),
+          textAlign: TextAlign.center,
+          style: new TextStyle(fontSize: 20.0),
+        ),
+      ));
+    return new Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        new Flex(
+          direction: Axis.horizontal,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            new Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: new Text(
+                team1.name,
+                textAlign: TextAlign.center,
+                style: new TextStyle(fontSize: 20.0),
+              ),
+            ),
+            new Expanded(
+                child: new Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: new Flex(
+                    children: scoresTeam1,
+                    direction: Axis.horizontal,
+                  ),
+                )),
+          ],
+        ),
+        new Flex(
+          direction: Axis.horizontal,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            new Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: new Text(
+                team2.name,
+                textAlign: TextAlign.center,
+                style: new TextStyle(fontSize: 20.0),
+              ),
+            ),
+            new Expanded(
+                child: new Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: new Flex(
+                    children: scoresTeam2,
+                    direction: Axis.horizontal,
+                  ),
+                )),
+          ],
+        ),
+      ],
+    );
   }
 }
 
-class TennisSettings extends StatelessWidget {
+class TennisSettings extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return new TennisSettingsState();
+  }
+}
+
+class TennisSettingsState extends State<TennisSettings> {
   final TextEditingController _periodWin = new TextEditingController();
   final TextEditingController _periodNumber = new TextEditingController();
 
@@ -313,6 +451,16 @@ class TennisSettings extends StatelessWidget {
               controller: _periodWin,
             )),
         new ListTile(
+            trailing: new Text("Tie Break"),
+            title: new Checkbox(
+              value: tieBreak,
+              onChanged: (value) {
+                setState(() {
+                  tieBreak = value;
+                });
+              },
+            )),
+        new ListTile(
             trailing: new Text("Al Meglio di (# set)"),
             title: new TextField(
               keyboardType: TextInputType.number,
@@ -323,5 +471,14 @@ class TennisSettings extends StatelessWidget {
             )),
       ]),
     );
+  }
+}
+
+class TennisPlayer extends Player {
+  bool service = false;
+  int setWon = 0;
+
+  TennisPlayer(name, value, [bool service = false]) : super(name, value) {
+    this.service = service;
   }
 }

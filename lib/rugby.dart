@@ -195,7 +195,8 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
           child: new MaterialButton(
             onPressed: () {
               setState(() {
-                team.value -= 1;
+                if (team.value > 0)
+                  team.value -= 1;
               });
             },
             child: new Row(

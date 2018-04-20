@@ -41,7 +41,8 @@ class Parent extends StatelessWidget {
             ),
             backgroundColor: Colors.blue,
           ),
-          body: new MyApp(),
+          body: new Flex(
+            children: <Widget>[new MyApp(),], direction: Axis.vertical,),
         ));
   }
 }
@@ -49,12 +50,11 @@ class Parent extends StatelessWidget {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new GridView.count(
+    return new Expanded(
+      child: new GridView.count(
         crossAxisCount: 2,
-        childAspectRatio: 1.0,
         padding: const EdgeInsets.fromLTRB(16.0, 25.0, 16.0, 4.0),
-        mainAxisSpacing: 4.0,
-        crossAxisSpacing: 3.0,
+
         children: <Widget>[
           new MaterialButton(
             onPressed: () {
@@ -148,6 +148,7 @@ class MyApp extends StatelessWidget {
               ],
             ),
           ),
-        ]);
+        ]),
+    );
   }
 }

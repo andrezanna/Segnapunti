@@ -40,7 +40,8 @@ class BiliardoState extends State<Biliardo> {
       appBar: new AppBar(
         title: new Text('Biliardo'),
       ),
-      body: new ListView(children: <Widget>[buildBiliardo(), buildPlayers()]),
+      body: new Flex(direction: Axis.vertical,
+          children: <Widget>[buildBiliardo(), buildPlayers()]),
       bottomNavigationBar: new BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           new BottomNavigationBarItem(
@@ -118,172 +119,164 @@ class BiliardoState extends State<Biliardo> {
     });
   }
 
-  void
-
-  rePaint
-
-  (void b) {
-  setState(() {});
+  void rePaint(void b) {
+    setState(() {});
   }
 
   Widget buildBiliardo() {
-  return new Container(
-  child: new GridView.count(
-  crossAxisCount: 4,
-  childAspectRatio: 1.0,
-  padding: const EdgeInsets.fromLTRB(16.0, 25.0, 16.0, 30.0),
-  mainAxisSpacing: 4.0,
-  crossAxisSpacing: 3.0,
-  shrinkWrap: true,
-  children: <Widget>[
-  new MovableBall(
-  1,
-  '/images/p1.png',
-  Colors.yellow,
-  ),
-  new MovableBall(
-  2,
-  '/images/p2.png',
-  Colors.blue,
-  ),
-  new MovableBall(
-  3,
-  '/images/p3.png',
-  Colors.red,
-  ),
-  new MovableBall(
-  4,
-  '/images/p4.png',
-  Colors.purple,
-  ),
-  new MovableBall(
-  5,
-  '/images/p5.png',
-  Colors.orange,
-  ),
-  new MovableBall(
-  6,
-  '/images/p6.png',
-  Colors.green,
-  ),
-  new MovableBall(
-  7,
-  '/images/p7.png',
-  Colors.brown,
-  ),
-  new MovableBall(
-  8,
-  '/images/p8.png',
-  Colors.black,
-  ),
-  new MovableBall(
-  9,
-  '/images/p9.png',
-  Colors.yellow,
-  ),
-  new MovableBall(
-  10,
-  '/images/p10.png',
-  Colors.blue,
-  ),
-  new MovableBall(
-  11,
-  '/images/p11.png',
-  Colors.red,
-  ),
-  new MovableBall(
-  12,
-  '/images/p12.png',
-  Colors.purple,
-  ),
-  new MovableBall(
-  13,
-  '/images/p13.png',
-  Colors.orange,
-  ),
-  new MovableBall(
-  14,
-  '/images/p14.png',
-  Colors.green,
-  ),
-  new MovableBall(
-  15,
-  '/images/p15.png',
-  Colors.brown,
-  ),
-  ],
-  ),
-  );
+    return new Expanded(
+      child: new GridView.count(
+        crossAxisCount: 4,
+        childAspectRatio: 1.0,
+        padding: const EdgeInsets.fromLTRB(16.0, 25.0, 16.0, 30.0),
+        children: <Widget>[
+          new MovableBall(
+            1,
+            '/images/p1.png',
+            Colors.yellow,
+          ),
+          new MovableBall(
+            2,
+            '/images/p2.png',
+            Colors.blue,
+          ),
+          new MovableBall(
+            3,
+            '/images/p3.png',
+            Colors.red,
+          ),
+          new MovableBall(
+            4,
+            '/images/p4.png',
+            Colors.purple,
+          ),
+          new MovableBall(
+            5,
+            '/images/p5.png',
+            Colors.orange,
+          ),
+          new MovableBall(
+            6,
+            '/images/p6.png',
+            Colors.green,
+          ),
+          new MovableBall(
+            7,
+            '/images/p7.png',
+            Colors.brown,
+          ),
+          new MovableBall(
+            8,
+            '/images/p8.png',
+            Colors.black,
+          ),
+          new MovableBall(
+            9,
+            '/images/p9.png',
+            Colors.yellow,
+          ),
+          new MovableBall(
+            10,
+            '/images/p10.png',
+            Colors.blue,
+          ),
+          new MovableBall(
+            11,
+            '/images/p11.png',
+            Colors.red,
+          ),
+          new MovableBall(
+            12,
+            '/images/p12.png',
+            Colors.purple,
+          ),
+          new MovableBall(
+            13,
+            '/images/p13.png',
+            Colors.orange,
+          ),
+          new MovableBall(
+            14,
+            '/images/p14.png',
+            Colors.green,
+          ),
+          new MovableBall(
+            15,
+            '/images/p15.png',
+            Colors.brown,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget buildPlayers() {
-  double width = MediaQuery.of(context).size.width;
-  return new Container(
-  padding: const EdgeInsets.fromLTRB(
-  16.0,
-  4.0,
-  16.0,
-  4.0,
-  ),
-  constraints: new BoxConstraints(
-  minWidth: 0.0,
-  maxWidth: width,
-  minHeight: 50.0,
-  maxHeight: 100.0,
-  ),
-  child: new ListView.builder(
-  shrinkWrap: true,
-  scrollDirection: Axis.horizontal,
-  itemBuilder: (BuildContext context, int index) {
-  return new BuildPlayer(
-  index,
-  removePlayer,
-  rePaint,
-  );
-  },
-  itemCount: _players,
-  ),
-  );
+    double width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    return new Container(
+      padding: const EdgeInsets.fromLTRB(
+        16.0,
+        4.0,
+        16.0,
+        4.0,
+      ),
+      constraints: new BoxConstraints(
+        minWidth: 0.0,
+        maxWidth: width,
+        minHeight: 50.0,
+        maxHeight: 100.0,
+      ),
+      child: new ListView.builder(
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (BuildContext context, int index) {
+          return new BuildPlayer(
+            index,
+            removePlayer,
+            rePaint,
+          );
+        },
+        itemCount: _players,
+      ),
+    );
   }
 
   void _annulla() {
-  setState(() {
-  Moves move = moves.last;
-  moves.removeLast();
-  players[move.player].value -= move.value;
-  ballState[move.value - 1] = true;
-  });
+    setState(() {
+      Moves move = moves.last;
+      moves.removeLast();
+      players[move.player].value -= move.value;
+      ballState[move.value - 1] = true;
+    });
   }
 
   void reset() {
-  moves.clear();
-  for (int i = 0; i < ballState.length; i++) {
-  ballState[i] = true;
-  }
-  for (int i = 0; i < players.length; i++) {
-  players[i].value = 0;
-  }
-  setState(() {});
-  }
-
-  void cleanBalls(List<int> indexes)
-
-  {
-  for (var num in indexes.reversed) {
-  Moves move = moves[num];
-  moves.removeAt(num);
-  ballState[move.value - 1] = true;
-  }
-  setState(() {});
-  Navigator.of(context).pop();
+    moves.clear();
+    for (int i = 0; i < ballState.length; i++) {
+      ballState[i] = true;
+    }
+    for (int i = 0; i < players.length; i++) {
+      players[i].value = 0;
+    }
+    setState(() {});
   }
 
-  void removeMoves(List<int> indexes)
-
-  {
-  for (var num in indexes.reversed) {
-  moves.removeAt(num);
+  void cleanBalls(List<int> indexes) {
+    for (var num in indexes.reversed) {
+      Moves move = moves[num];
+      moves.removeAt(num);
+      ballState[move.value - 1] = true;
+    }
+    setState(() {});
+    Navigator.of(context).pop();
   }
+
+  void removeMoves(List<int> indexes) {
+    for (var num in indexes.reversed) {
+      moves.removeAt(num);
+    }
   }
 }
 
@@ -292,36 +285,13 @@ class BuildPlayer extends StatefulWidget {
 
   final ValueChanged<int> _removePlayer;
 
-  final ValueChanged
-
-  <
-
-  void
-
-  >
-
-  _onChanged
-
-  ;
+  final ValueChanged<void> _onChanged;
   final int index;
 
   @override
-  createState()
-
-  => new BuildPlayerState(
-  index: index, removePlayer:
-
-  _removePlayer
-
-  ,
-
-  onChanged
-
-      :
-
-  _onChanged
-
-  );
+  createState() =>
+      new BuildPlayerState(
+          index: index, removePlayer: _removePlayer, onChanged: _onChanged);
 }
 
 class BuildPlayerState extends State<BuildPlayer> {
@@ -334,91 +304,84 @@ class BuildPlayerState extends State<BuildPlayer> {
   //Approccio child state, parent state, mixed state
   final ValueChanged<int> removePlayer;
 
-  final ValueChanged
-
-  <
-
-  void
-
-  >
-
-  onChanged
-
-  ;
+  final ValueChanged<void> onChanged;
   final TextEditingController _controller = new TextEditingController();
   FocusNode focusNode = new FocusNode();
   final int index;
 
   @override
   Widget build(BuildContext context) {
-  _controller.addListener(nameChange);
-  focusNode.addListener(_ensureVisible);
-  double width = MediaQuery.of(context).size.width;
-  return new Dismissible(
-  direction: DismissDirection.down,
-  key: new ObjectKey(players[index].name),
-  onDismissed: (DismissDirection direction) {
-  setState(() {
-  removePlayer(index);
-  });
-  },
-  child: new DragTarget<BallMove>(onAccept: (BallMove data) {
-  addValue(data.value);
-  }, builder: (BuildContext context, List<BallMove> accepted,
-  List<dynamic> rejected) {
-  return new Container(
-  width: Math.max((width - 32.0) / players.length, 110.0),
-  decoration: new BoxDecoration(
-  color: accepted.isEmpty ? null : Colors.grey.shade200,
-  border: new Border.all(
-  width: 3.0,
-  color: accepted.isEmpty
-  ? Colors.transparent
-      : accepted.last.color),
-  ),
-  padding: const EdgeInsets.fromLTRB(4.0, 4.0, 16.0, 4.0),
-  child: new Column(
-  children: <Widget>[
-  new Expanded(
-  child: new Center(
-  child: new Text(
-  players[index].value.toString(),
-  ),
-  )),
-  new TextField(
-  controller: _controller,
-  textAlign: TextAlign.center,
-  focusNode: focusNode,
-  decoration: new InputDecoration(
-  hintText: players[index].name,
-  ),
-  ),
-  ],
-  ),
-  );
-  }),
-  );
+    _controller.addListener(nameChange);
+    focusNode.addListener(_ensureVisible);
+    double width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    return new Dismissible(
+      direction: DismissDirection.down,
+      key: new ObjectKey(players[index].name),
+      onDismissed: (DismissDirection direction) {
+        setState(() {
+          removePlayer(index);
+        });
+      },
+      child: new DragTarget<BallMove>(onAccept: (BallMove data) {
+        addValue(data.value);
+      }, builder: (BuildContext context, List<BallMove> accepted,
+          List<dynamic> rejected) {
+        return new Container(
+          width: Math.max((width - 32.0) / players.length, 110.0),
+          decoration: new BoxDecoration(
+            color: accepted.isEmpty ? null : Colors.grey.shade200,
+            border: new Border.all(
+                width: 3.0,
+                color: accepted.isEmpty
+                    ? Colors.transparent
+                    : accepted.last.color),
+          ),
+          padding: const EdgeInsets.fromLTRB(4.0, 4.0, 16.0, 4.0),
+          child: new Column(
+            children: <Widget>[
+              new Expanded(
+                  child: new Center(
+                    child: new Text(
+                      players[index].value.toString(),
+                    ),
+                  )),
+              new TextField(
+                controller: _controller,
+                textAlign: TextAlign.center,
+                focusNode: focusNode,
+                decoration: new InputDecoration(
+                  hintText: players[index].name,
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
   }
 
   void addValue(int value) {
-  setState(() {
-  players[index].value += value;
-  ballState[value - 1] = false;
-  moves.add(new Moves(value, index));
-  onChanged(null);
-  });
+    setState(() {
+      players[index].value += value;
+      ballState[value - 1] = false;
+      moves.add(new Moves(value, index));
+      onChanged(null);
+    });
   }
 
   void _ensureVisible() {
-  Util.ensureVisible(context, focusNode);
+    Util.ensureVisible(context, focusNode);
   }
 
   void nameChange() {
-  if (_controller.text.isNotEmpty) {
-  players[index].setName(_controller.text);
-  } else {
-  players[index].setName("Giocatore ${index+1}");
-  }
+    if (_controller.text.isNotEmpty) {
+      players[index].setName(_controller.text);
+    } else {
+      players[index].setName("Giocatore ${index + 1}");
+    }
   }
 }
 

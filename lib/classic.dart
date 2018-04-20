@@ -73,23 +73,15 @@ class ClassicState extends State<Classic> {
     );
   }
 
-  void
-
-  rePaint
-
-  (void b)
-
-  {
-  setState(() {});
+  void rePaint(void b) {
+    setState(() {});
   }
 
-  void removePlayer(int index)
-
-  {
-  setState(() {
-  play.removeAt(index);
-  _players--;
-  });
+  void removePlayer(int index) {
+    setState(() {
+      play.removeAt(index);
+      _players--;
+    });
   }
 }
 
@@ -98,36 +90,13 @@ class BuildRow extends StatefulWidget {
 
   final ValueChanged<int> _removePlayer;
 
-  final ValueChanged
-
-  <
-
-  void
-
-  >
-
-  _onChanged
-
-  ;
+  final ValueChanged<void> _onChanged;
   final int index;
 
   @override
-  createState()
-
-  => new BuildRowState(
-  index: index, removePlayer:
-
-  _removePlayer
-
-  ,
-
-  onChanged
-
-      :
-
-  _onChanged
-
-  );
+  createState() =>
+      new BuildRowState(
+          index: index, removePlayer: _removePlayer, onChanged: _onChanged);
 }
 
 class BuildRowState extends State<BuildRow> {
@@ -140,135 +109,124 @@ class BuildRowState extends State<BuildRow> {
   //Approccio child state, parent state, mixed state
   final ValueChanged<int> removePlayer;
 
-  final ValueChanged
-
-  <
-
-  void
-
-  >
-
-  onChanged
-
-  ;
+  final ValueChanged<void> onChanged;
   final int index;
   final TextEditingController _controller = new TextEditingController();
   bool maxReached = false;
   FocusNode focusNode = new FocusNode();
 
   Widget _buildRow(int index) {
-  _controller.addListener(nameChange);
-  focusNode.addListener(_ensureVisible);
-  NumberPicker p = buildPickerInteger(index);
-  play[index].setNumberPicker(p);
-  return new Dismissible(
-  key: new ObjectKey(play[index]),
-  direction: DismissDirection.endToStart,
-  onDismissed: (DismissDirection direction) {
-  setState(() {
-  removePlayer(index);
-  });
-  },
-  background:
-  new Container(decoration: new BoxDecoration(color: Colors.red)),
-  child: new ListTile(
-  title: new Container(
-  child: new TextField(
-  controller: _controller,
-  focusNode: focusNode,
-  decoration: new InputDecoration(
-  hintText: play[index].name,
-  ),
-  ),
-  ),
-  trailing: p,
-  ));
+    _controller.addListener(nameChange);
+    focusNode.addListener(_ensureVisible);
+    NumberPicker p = buildPickerInteger(index);
+    play[index].setNumberPicker(p);
+    return new Dismissible(
+        key: new ObjectKey(play[index]),
+        direction: DismissDirection.endToStart,
+        onDismissed: (DismissDirection direction) {
+          setState(() {
+            removePlayer(index);
+          });
+        },
+        background:
+        new Container(decoration: new BoxDecoration(color: Colors.red)),
+        child: new ListTile(
+          title: new Container(
+            child: new TextField(
+              controller: _controller,
+              focusNode: focusNode,
+              decoration: new InputDecoration(
+                hintText: play[index].name,
+              ),
+            ),
+          ),
+          trailing: p,
+        ));
   }
 
   void _ensureVisible() {
-  Util.ensureVisible(context, focusNode);
+    Util.ensureVisible(context, focusNode);
   }
 
   Widget buildPickerInteger(int index) {
-  return new NumberPicker.integer(
-  minValue: minValue,
-  maxValue: maxValue,
-  horizontal: true,
-  initialValue:
-  (play[index].value >= minValue && play[index].value <= maxValue)
-  ? play[index].value
-      : play[index].value = minValue,
-  listViewWidth: 150.0,
-  listViewHeight: 50.0,
-  itemExtent: 50.0,
-  onChanged: (newValue) {
-  setState(() {
-  play[index].value = newValue;
-  if (play[index].value == maxValue && !maxReached) {
-  maxReached = true;
-  showDialog(
-  builder: (context) => new AlertDialog(
-  title: new Text("Vincitore!!"),
-  content: new Text("${play[index]
+    return new NumberPicker.integer(
+      minValue: minValue,
+      maxValue: maxValue,
+      horizontal: true,
+      initialValue:
+      (play[index].value >= minValue && play[index].value <= maxValue)
+          ? play[index].value
+          : play[index].value = minValue,
+      listViewWidth: 150.0,
+      listViewHeight: 50.0,
+      itemExtent: 50.0,
+      onChanged: (newValue) {
+        setState(() {
+          play[index].value = newValue;
+          if (play[index].value == maxValue && !maxReached) {
+            maxReached = true;
+            showDialog(
+                builder: (context) =>
+                new AlertDialog(
+                  title: new Text("Vincitore!!"),
+                  content: new Text("${play[index]
       .name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
-  actions: <Widget>[
-  new MaterialButton(
-  onPressed: () {
-  maxReached = false;
-  Navigator.pop(context);
-  },
-  child: new Icon(
-  Icons.close,
-  color: Colors.black,
-  ),
-  ),
-  new MaterialButton(
-  onPressed: () {
-  maxReached = false;
-  resetGame();
-  },
-  child: new Icon(
-  Icons.done,
-  color: Colors.black,
-  ),
-  )
-  ],
-  ),
-  context: context,
-  barrierDismissible: false);
-  } else {
-  null;
-  }
-  });
-  },
-  );
+                  actions: <Widget>[
+                    new MaterialButton(
+                      onPressed: () {
+                        maxReached = false;
+                        Navigator.pop(context);
+                      },
+                      child: new Icon(
+                        Icons.close,
+                        color: Colors.black,
+                      ),
+                    ),
+                    new MaterialButton(
+                      onPressed: () {
+                        maxReached = false;
+                        resetGame();
+                      },
+                      child: new Icon(
+                        Icons.done,
+                        color: Colors.black,
+                      ),
+                    )
+                  ],
+                ),
+                context: context,
+                barrierDismissible: false);
+          } else {
+            null;
+          }
+        });
+      },
+    );
   }
 
   void resetGame() {
-  Navigator.pop(context);
-  for (var pl in play) {
-  pl.setValue(minValue);
-  pl.np.animateIntfor(minValue, 10000);
-  }
-  onChanged(null);
+    Navigator.pop(context);
+    for (var pl in play) {
+      pl.setValue(minValue);
+      pl.np.animateIntfor(minValue, 10000);
+    }
+    onChanged(null);
   }
 
   void nameChange() {
-  scrollController.animateTo(50.0 * index,
-  duration: new Duration(milliseconds: 1000), curve: Curves.easeOut);
+    scrollController.animateTo(50.0 * index,
+        duration: new Duration(milliseconds: 1000), curve: Curves.easeOut);
 
-  if (_controller.text.isNotEmpty) {
-  play[index].setName(_controller.text);
-  } else {
-  play[index].setName("Giocatore ${index+1}");
-  }
+    if (_controller.text.isNotEmpty) {
+      play[index].setName(_controller.text);
+    } else {
+      play[index].setName("Giocatore ${index + 1}");
+    }
   }
 
   @override
-  Widget build(BuildContext context)
-
-  {
-  return _buildRow(index);
+  Widget build(BuildContext context) {
+    return _buildRow(index);
   }
 }
 
