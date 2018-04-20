@@ -1,9 +1,6 @@
-import 'dart:core';
-
 import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
-
 
 int periodWin = 6;
 int periodNumber = 3;
@@ -18,11 +15,19 @@ class Tennis extends StatefulWidget {
 }
 
 class TennisState extends State<Tennis> {
-  TennisPlayer player1 = new TennisPlayer("Giocatore 1", 0, true);
-  TennisPlayer player2 = new TennisPlayer("Giocatore 2", 0);
+  TennisPlayer player1 = new TennisPlayer(
+    "Giocatore 1",
+    0,
+    1,
+    true,
+  );
+  TennisPlayer player2 = new TennisPlayer(
+    "Giocatore 2",
+    0,
+    2,
+  );
   final List<Scores> scores = new List();
   Scores lastPeriod = new Scores(0, 0);
-
 
   @override
   Widget build(BuildContext context) {
@@ -212,9 +217,14 @@ class TennisScoreState extends State<TennisScore> {
   final ValueChanged<TennisPlayer> pointScored;
 
   final TennisPlayer team;
+  final TextEditingController _controller = new TextEditingController();
+  FocusNode focusNode = new FocusNode();
 
   @override
   Widget build(BuildContext context) {
+    _controller.addListener(nameChange);
+    focusNode.addListener(_ensureVisible);
+
     List<String> points = ["0", "15", "30", "40", "ADV"];
     return new Flex(
       direction: Axis.vertical,
@@ -248,9 +258,17 @@ class TennisScoreState extends State<TennisScore> {
         ),
         new Expanded(
           child: new Center(
-            child: new Text(
-              team.name,
-              style: new TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+            child: new TextField(
+              controller: _controller,
+              focusNode: focusNode,
+              textAlign: TextAlign.center,
+              decoration: new InputDecoration(
+                hintText: team.name,
+              ),
+              style: new TextStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black54),
             ),
           ),
         ),
@@ -258,8 +276,7 @@ class TennisScoreState extends State<TennisScore> {
           child: new MaterialButton(
               onPressed: () {
                 setState(() {
-                  if (!matchWon)
-                    team.value += 1;
+                  if (!matchWon) team.value += 1;
                 });
                 pointScored(team);
               },
@@ -270,6 +287,18 @@ class TennisScoreState extends State<TennisScore> {
         ),
       ],
     );
+  }
+
+  void _ensureVisible() {
+    ensureVisible(context, focusNode);
+  }
+
+  void nameChange() {
+    if (_controller.text.isNotEmpty) {
+      team.setName(_controller.text);
+    } else {
+      team.setName("Giocatore ${team.index}");
+    }
   }
 }
 
@@ -475,8 +504,11 @@ class TennisSettingsState extends State<TennisSettings> {
 class TennisPlayer extends Player {
   bool service = false;
   int setWon = 0;
+  int index;
 
-  TennisPlayer(name, value, [bool service = false]) : super(name, value) {
+  TennisPlayer(name, value, index, [bool service = false])
+      : super(name, value) {
     this.service = service;
+    this.index = index;
   }
 }
