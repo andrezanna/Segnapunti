@@ -133,7 +133,6 @@ class TennisState extends State<Tennis> {
                 scores[inPeriod].team1 >= scores[inPeriod].team2 + 2) ||
                 inTieBreak) {
               inPeriod += 1;
-              print("${player.setWon + 1} ${(periodNumber / 2).ceil()}");
               if (++player.setWon >= (periodNumber / 2).ceil()) {
                 matchWon = true;
               }
@@ -144,7 +143,6 @@ class TennisState extends State<Tennis> {
                 scores[inPeriod].team2 >= scores[inPeriod].team1 + 2) ||
                 inTieBreak) {
               inPeriod += 1;
-              print("${player.setWon + 1} ${(periodNumber / 2).ceil()}");
 
               if (++player.setWon >= (periodNumber / 2).ceil()) {
                 matchWon = true;
