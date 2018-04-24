@@ -57,7 +57,7 @@ flutter:
   fonts:
     - family: ShotClock
       fonts:
-        - asset: utils/ShotClock.ttf.
+        - asset: utils/ShotClock.ttf
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
