@@ -4,20 +4,41 @@ import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/timertextformatter.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 int periodLength = 10;
 int teamFoulThreshold = 4;
 int periodNumber = 4;
-
+int shotClock = 24;
 TimerTextState timerSuper;
 int inPeriod = 0;
 Stopwatch stopwatch = new Stopwatch();
+bool darkTheme = false;
 
 //TODO - Timer Unificato
+//TODO - Shot Clock
 
 class Basket extends StatefulWidget {
   @override
-  createState() => new BasketState();
+  createState() {
+    getSharedPreferences();
+    return new BasketState();
+  }
+
+  getSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    darkTheme = prefs.getBool("dark");
+    if (darkTheme == null) darkTheme = false;
+    periodLength = prefs.getInt("BasketLength");
+    if (periodLength == null) periodLength = 10;
+    periodNumber = prefs.getInt("BasketNumber");
+    if (periodNumber == null) periodNumber = 4;
+    teamFoulThreshold = prefs.getInt("BasketFouls");
+    if (teamFoulThreshold == null) teamFoulThreshold = 4;
+    shotClock = prefs.getInt("BasketShot");
+    if (shotClock == null) shotClock = 24;
+  }
 }
 
 class BasketState extends State<Basket> {
@@ -25,9 +46,11 @@ class BasketState extends State<Basket> {
   BasketTeam team2 = new BasketTeam("Trasferta", 0);
   final List<Scores> scores = new List();
   Scores lastPeriod = new Scores(0, 0);
+  SharedPreferences prefs;
 
   @override
   Widget build(BuildContext context) {
+    getSharedPrefs();
     if (scores.isEmpty || scores.length != periodNumber) {
       scores.clear();
       for (int i = 0; i < periodNumber; i++)
@@ -41,7 +64,8 @@ class BasketState extends State<Basket> {
         },
         child: new Text(
           "IMPOSTAZIONI",
-          style: new TextStyle(color: Colors.white),
+          style:
+          new TextStyle(color: (darkTheme) ? Colors.black : Colors.white),
         ),
       ),
     ];
@@ -53,18 +77,48 @@ class BasketState extends State<Basket> {
           },
           child: new Text(
             "NUOVA",
-            style: new TextStyle(color: Colors.white),
+            style:
+            new TextStyle(color: (darkTheme) ? Colors.black : Colors.white),
           ),
         ),
       );
     }
     return new Scaffold(
+      backgroundColor: (darkTheme)
+          ? Color.fromARGB(255, 50, 50, 50)
+          : Color.fromARGB(255, 250, 250, 250),
       appBar: new AppBar(
+        leading: new BackButton(
+          color: (darkTheme) ? Colors.black : Colors.white,
+        ),
+        textTheme: new TextTheme(
+            title: new TextStyle(
+                color: (darkTheme) ? Colors.black : Colors.white,
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold)),
         title: new Text('Basket'),
         actions: actions,
       ),
       body: _buildBasket(),
     );
+  }
+
+  @override
+  void dispose() async {
+    try {
+      super.dispose();
+    } catch (b) {
+      print("test");
+      this.dispose();
+    }
+    prefs.setInt("BasketNumber", periodNumber);
+    prefs.setInt("BasketLength", periodLength);
+    prefs.setInt("BasketFouls", teamFoulThreshold);
+    prefs.setInt("BasketShot", shotClock);
+  }
+
+  getSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
   void onTimeEnd(void a) {
@@ -138,7 +192,7 @@ class BasketState extends State<Basket> {
             context: context,
             builder: (context) =>
             new AlertDialog(
-              title: new Text("Impossibila avviare cronometro"),
+              title: new Text("Impossibile avviare cronometro"),
               content: new Text(
                   "La partita è finita, vuoi iniziare una nuova partita?"),
               actions: <Widget>[
@@ -192,8 +246,7 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
           child: new MaterialButton(
             onPressed: () {
               setState(() {
-                if (team.value > 0)
-                  team.value -= 1;
+                if (team.value > 0) team.value -= 1;
               });
             },
             child: new Row(
@@ -203,7 +256,8 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                   team.value.toString(),
                   style: new TextStyle(
                     color: Colors.red,
-                    fontSize: 40.0,
+                    fontFamily: "ShotClock",
+                    fontSize: 70.0,
                   ),
                   textAlign: TextAlign.right,
                 ),
@@ -220,7 +274,11 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
           child: new Center(
             child: new Text(
               team.name,
-              style: new TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+              style: new TextStyle(
+                color: (darkTheme) ? Colors.blue : Colors.black,
+                fontSize: 30.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -235,7 +293,9 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
               },
               child: new Text(
                 "+1",
-                style: new TextStyle(fontSize: 25.0),
+                style: new TextStyle(
+                    fontSize: 25.0,
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               )),
         ),
         new Expanded(
@@ -248,7 +308,10 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
               },
               child: new Text(
                 "+2",
-                style: new TextStyle(fontSize: 25.0),
+                style: new TextStyle(
+                    fontSize: 25.0,
+
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               )),
         ),
         new Expanded(
@@ -261,7 +324,10 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                 },
                 child: new Text(
                   "+3",
-                  style: new TextStyle(fontSize: 25.0),
+                  style: new TextStyle(
+                      fontSize: 25.0,
+
+                      color: (darkTheme) ? Colors.blue : Colors.black),
                 ))),
         new Expanded(
           child: new MaterialButton(
@@ -272,7 +338,10 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
               },
               child: new Text(
                 "FALLO",
-                style: new TextStyle(fontSize: 25.0),
+                style: new TextStyle(
+                    fontSize: 25.0,
+
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               )),
         ),
       ],
@@ -316,7 +385,10 @@ class TeamScorePeriodState extends State<TeamScorePeriod> {
                       child: new Text(
                         scores[index].team1.toString(),
                         textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 20.0),
+                        style: new TextStyle(
+                            fontSize: 20.0,
+
+                            color: (darkTheme) ? Colors.blue : Colors.black),
                       ),
                     ),
                     new Container(
@@ -337,7 +409,10 @@ class TeamScorePeriodState extends State<TeamScorePeriod> {
                       child: new Text(
                         scores[index].team2.toString(),
                         textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 20.0),
+                        style: new TextStyle(
+                            fontSize: 20.0,
+
+                            color: (darkTheme) ? Colors.blue : Colors.black),
                       ),
                     ),
                   ],
@@ -360,7 +435,7 @@ class BasketSettings extends StatelessWidget {
     _periodLength.addListener(() {
       if (_periodLength.text.isNotEmpty) {
         int newValue = int.parse(_periodLength.text.toString());
-        if (newValue >= 0) {
+        if (newValue > 0) {
           periodLength = newValue;
           stopwatch.reset();
         } else if (!(shown)) {
@@ -442,34 +517,65 @@ class BasketSettings extends StatelessWidget {
       }
     });
     return new Scaffold(
-      appBar: new AppBar(),
+      backgroundColor: (darkTheme)
+          ? Color.fromARGB(255, 50, 50, 50)
+          : Color.fromARGB(255, 250, 250, 250),
+      appBar: new AppBar(
+        leading: new BackButton(
+          color: (darkTheme) ? Colors.black : Colors.white,
+        ),
+      ),
       body: new Column(children: <Widget>[
         new ListTile(
-            trailing: new Text("Durata Quarto"),
+            trailing: new Text(
+              "Durata Quarto",
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
+            ),
             title: new TextField(
               keyboardType: TextInputType.number,
               decoration: new InputDecoration(
                 hintText: periodLength.toString(),
+                hintStyle: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               ),
               controller: _periodLength,
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             )),
         new ListTile(
-            trailing: new Text("Numero di Tempi"),
+            trailing: new Text(
+              "Numero di Tempi",
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
+            ),
             title: new TextField(
               keyboardType: TextInputType.number,
               decoration: new InputDecoration(
                 hintText: periodNumber.toString(),
+                hintStyle: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               ),
               controller: _periodNumber,
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             )),
         new ListTile(
-            trailing: new Text("Falli per bonus"),
+            trailing: new Text(
+              "Falli per bonus",
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
+            ),
             title: new TextField(
               keyboardType: TextInputType.number,
               decoration: new InputDecoration(
                 hintText: teamFoulThreshold.toString(),
+                hintStyle: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               ),
               controller: _teamFoul,
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             )),
       ]),
     );
@@ -572,7 +678,7 @@ class TimerTextState extends State<TimerText> {
   @override
   Widget build(BuildContext context) {
     final TextStyle timerTextStyle = const TextStyle(
-        fontSize: 60.0, fontFamily: "Open Sans", color: Colors.red);
+        fontSize: 80.0, fontFamily: "ShotClock", color: Colors.red);
     text = TimerTextFormatter.format(
         (periodLength * 1000 * 60) - stopwatch.elapsedMilliseconds,
         stopwatch.elapsedMilliseconds > (periodLength - 1) * 1000 * 60);

@@ -3,12 +3,13 @@ import 'package:Segnapunti/util.dart' as Util;
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 
+bool darkTheme = false;
+
 class Classic extends StatefulWidget {
   @override
   createState() {
-    play.clear();
-    play.add(new ClassicPlayer("Giocatore 1", minValue));
-    play.add(new ClassicPlayer("Giocatore 2", minValue));
+    getSharedPreferences();
+
     return new ClassicState();
   }
 }

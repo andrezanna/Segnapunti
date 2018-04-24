@@ -4,6 +4,7 @@ description: Test Segnapunti Flutter.
 dependencies:
   flutter:
     sdk: flutter
+  shared_preferences: "0.4.1"
   numberpicker:
     git:
       url: git@github.com:andrezanna/NumberPicker.git
@@ -53,6 +54,11 @@ flutter:
     - images/tennis.png
     - images/rugby.png
     - images/numbers.png
+  fonts:
+    - family: ShotClock
+      fonts:
+        - asset: utils/ShotClock.ttf.
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

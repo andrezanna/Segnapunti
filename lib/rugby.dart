@@ -4,18 +4,35 @@ import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/timertextformatter.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 int periodLength = 40;
 int periodNumber = 2;
 TimerTextState timerSuper;
 int inPeriod = 0;
 Stopwatch stopwatch = new Stopwatch();
+bool darkTheme = false;
+
 
 //TODO - period Number
 
 class Rugby extends StatefulWidget {
   @override
-  createState() => new RugbyState();
+  createState() {
+    getSharedPreferences();
+    return new RugbyState();
+  }
+
+  getSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    darkTheme = prefs.getBool("dark");
+    if (darkTheme == null) darkTheme = false;
+    periodLength = prefs.getInt("RugbyLength");
+    if (periodLength == null) periodLength = 40;
+    periodNumber = prefs.getInt("RugbyNumber");
+    if (periodNumber == null) periodNumber = 2;
+  }
 }
 
 class RugbyState extends State<Rugby> {
@@ -40,7 +57,8 @@ class RugbyState extends State<Rugby> {
         },
         child: new Text(
           "IMPOSTAZIONI",
-          style: new TextStyle(color: Colors.white),
+          style:
+          new TextStyle(color: (darkTheme) ? Colors.black : Colors.white),
         ),
       ),
     ];
@@ -52,7 +70,8 @@ class RugbyState extends State<Rugby> {
           },
           child: new Text(
             "NUOVA",
-            style: new TextStyle(color: Colors.white),
+            style:
+            new TextStyle(color: (darkTheme) ? Colors.black : Colors.white),
           ),
         ),
       );
@@ -60,116 +79,124 @@ class RugbyState extends State<Rugby> {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Rugby'),
+        leading: new BackButton(
+          color: (darkTheme) ? Colors.black : Colors.white,
+        ),
+        textTheme: new TextTheme(
+            title: new TextStyle(
+                color: (darkTheme) ? Colors.black : Colors.white,
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold)),
         actions: actions,
       ),
+      backgroundColor: (darkTheme)
+          ? Color.fromARGB(255, 50, 50, 50)
+          : Color.fromARGB(255, 250, 250, 250),
       body: _buildRugby(),
     );
   }
 
-  void
-
-  onTimeEnd
-
-  (void a)
-
-  {
-  setState(() {
-  scores[inPeriod].setScores(
-  team1.value - lastPeriod.team1, team2.value - lastPeriod.team2);
-  lastPeriod.setScores(team1.value, team2.value);
-  inPeriod++;
-  });
+  @override
+  void dispose() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt("RugbyNumber", periodNumber);
+    prefs.setInt("RugbyLength", periodLength);
+    super.dispose();
   }
 
-  Widget _buildRugby()
-
-  {
-  TimerText timerText = new TimerText();
-  return new Flex(
-  direction: Axis.vertical,
-  children: <Widget>[
-  new Center(
-  child: new Container(
-  color: Colors.black,
-  margin: const EdgeInsets.all(25.0),
-  constraints: new BoxConstraints(
-  minWidth: 200.0,
-  maxWidth: 300.0,
-  minHeight: 60.0,
-  maxHeight: 80.0),
-  child: new MaterialButton(
-  onPressed: () {
-  startStop();
-  },
-  child: new Center(
-  child: timerText,
-  ),
-  ),
-  ),
-  ),
-  new Expanded(
-  child: new Row(
-  mainAxisSize: MainAxisSize.max,
-  crossAxisAlignment: CrossAxisAlignment.center,
-  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  children: <Widget>[
-  new Expanded(child: new RugbyTeamScore(team1)),
-  new TeamScorePeriod(scores),
-  new Expanded(child: new RugbyTeamScore(team2)),
-  ],
-  ),
-  ),
-  ],
-  );
+  void onTimeEnd(void a) {
+    setState(() {
+      scores[inPeriod].setScores(
+          team1.value - lastPeriod.team1, team2.value - lastPeriod.team2);
+      lastPeriod.setScores(team1.value, team2.value);
+      inPeriod++;
+    });
   }
 
-  void startStop()
+  Widget _buildRugby() {
+    TimerText timerText = new TimerText();
+    return new Flex(
+      direction: Axis.vertical,
+      children: <Widget>[
+        new Center(
+          child: new Container(
+            color: Colors.black,
+            margin: const EdgeInsets.all(25.0),
+            constraints: new BoxConstraints(
+                minWidth: 200.0,
+                maxWidth: 300.0,
+                minHeight: 60.0,
+                maxHeight: 80.0),
+            child: new MaterialButton(
+              onPressed: () {
+                startStop();
+              },
+              child: new Center(
+                child: timerText,
+              ),
+            ),
+          ),
+        ),
+        new Expanded(
+          child: new Row(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              new Expanded(child: new RugbyTeamScore(team1)),
+              new TeamScorePeriod(scores),
+              new Expanded(child: new RugbyTeamScore(team2)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
-  {
-  if (stopwatch.isRunning) {
-  timerSuper.startStop(periodLength);
-  } else {
-  timerSuper.startStop(periodLength);
-  }
-  if (stopwatch.elapsedMilliseconds >= periodLength * 60 * 1000) {
-  if (inPeriod < scores.length) {
-  timerSuper.reset();
-  } else {
-  showDialog(
-  context: context,
-  builder: (context) => new AlertDialog(
-  title: new Text("Impossibila avviare cronometro"),
-  content: new Text(
-  "La partita è finita, vuoi iniziare una nuova partita?"),
-  actions: <Widget>[
-  new CloseButton(),
-  new MaterialButton(
-  onPressed: () {
-  Navigator.of(context).pop();
-  nuovaPartita();
-  },
-  child: new Icon(Icons.done),
-  )
-  ],
-  ));
-  }
-  }
+  void startStop() {
+    if (stopwatch.isRunning) {
+      timerSuper.startStop(periodLength);
+    } else {
+      timerSuper.startStop(periodLength);
+    }
+    if (stopwatch.elapsedMilliseconds >= periodLength * 60 * 1000) {
+      if (inPeriod < scores.length) {
+        timerSuper.reset();
+      } else {
+        showDialog(
+            context: context,
+            builder: (context) =>
+            new AlertDialog(
+              title: new Text("Impossibila avviare cronometro"),
+              content: new Text(
+                  "La partita è finita, vuoi iniziare una nuova partita?"),
+              actions: <Widget>[
+                new CloseButton(),
+                new MaterialButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    nuovaPartita();
+                  },
+                  child: new Icon(Icons.done),
+                )
+              ],
+            ));
+      }
+    }
   }
 
-  void nuovaPartita()
+  void nuovaPartita() {
+    setState(() {
+      lastPeriod.setScores(0, 0);
+      stopwatch.reset();
+      for (var score in scores) {
+        score.setScores(0, 0);
+      }
+      team1.value = 0;
+      team2.value = 0;
 
-  {
-  setState(() {
-  lastPeriod.setScores(0, 0);
-  stopwatch.reset();
-  for (var score in scores) {
-  score.setScores(0, 0);
-  }
-  team1.value = 0;
-  team2.value = 0;
-
-  inPeriod = 0;
-  });
+      inPeriod = 0;
+    });
   }
 }
 
@@ -195,8 +222,7 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
           child: new MaterialButton(
             onPressed: () {
               setState(() {
-                if (team.value > 0)
-                  team.value -= 1;
+                if (team.value > 0) team.value -= 1;
               });
             },
             child: new Row(
@@ -218,7 +244,9 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
           child: new Center(
             child: new Text(
               team.name,
-              style: new TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+              style: new TextStyle(fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             ),
           ),
         ),
@@ -232,7 +260,8 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
               },
               child: new Text(
                 "+5",
-                style: new TextStyle(fontSize: 25.0),
+                style: new TextStyle(fontSize: 25.0,
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               )),
         ),
         new Expanded(
@@ -245,7 +274,8 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
               },
               child: new Text(
                 "+2",
-                style: new TextStyle(fontSize: 25.0),
+                style: new TextStyle(fontSize: 25.0,
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               )),
         ),
         new Expanded(
@@ -258,7 +288,8 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
                 },
                 child: new Text(
                   "+3",
-                  style: new TextStyle(fontSize: 25.0),
+                  style: new TextStyle(fontSize: 25.0,
+                      color: (darkTheme) ? Colors.blue : Colors.black),
                 ))),
       ],
     );
@@ -305,7 +336,8 @@ class TeamScorePeriodState extends State<TeamScorePeriod> {
                       child: new Text(
                         scores[index].team1.toString(),
                         textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 20.0),
+                        style: new TextStyle(fontSize: 20.0,
+                            color: (darkTheme) ? Colors.blue : Colors.black),
                       ),
                     ),
                     new Container(
@@ -323,7 +355,8 @@ class TeamScorePeriodState extends State<TeamScorePeriod> {
                       child: new Text(
                         scores[index].team2.toString(),
                         textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 20.0),
+                        style: new TextStyle(fontSize: 20.0,
+                            color: (darkTheme) ? Colors.blue : Colors.black),
                       ),
                     ),
                   ],
@@ -399,25 +432,40 @@ class RugbySettings extends StatelessWidget {
       }
     });
     return new Scaffold(
-      appBar: new AppBar(),
+      appBar: new AppBar(leading: new BackButton(
+        color: (darkTheme) ? Colors.black : Colors.white,
+      ),),
+      backgroundColor: (darkTheme)
+          ? Color.fromARGB(255, 50, 50, 50)
+          : Color.fromARGB(255, 250, 250, 250),
       body: new Column(children: <Widget>[
         new ListTile(
-            trailing: new Text("Durata Tempo"),
+            trailing: new Text("Durata Tempo", style: new TextStyle(
+                color: (darkTheme) ? Colors.blue : Colors.black),),
             title: new TextField(
               keyboardType: TextInputType.number,
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
               decoration: new InputDecoration(
                 hintText: periodLength.toString(),
+                hintStyle: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               ),
               controller: _periodLength,
             )),
         new ListTile(
-            trailing: new Text("Numero di Tempi"),
+            trailing: new Text("Numero di Tempi", style: new TextStyle(
+                color: (darkTheme) ? Colors.blue : Colors.black),),
             title: new TextField(
               keyboardType: TextInputType.number,
               decoration: new InputDecoration(
                 hintText: periodNumber.toString(),
+                hintStyle: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               ),
               controller: _periodNumber,
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             )),
       ]),
     );
@@ -484,7 +532,7 @@ class TimerTextState extends State<TimerText> {
   @override
   Widget build(BuildContext context) {
     final TextStyle timerTextStyle = const TextStyle(
-        fontSize: 60.0, fontFamily: "Open Sans", color: Colors.red);
+        fontSize: 80.0, fontFamily: "ShotClock", color: Colors.red);
     text = TimerTextFormatter.format(stopwatch.elapsedMilliseconds);
     return new Text(text, style: timerTextStyle);
   }

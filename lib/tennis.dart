@@ -1,6 +1,7 @@
 import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 int periodWin = 6;
 int periodNumber = 3;
@@ -8,10 +9,27 @@ int inPeriod = 0;
 bool tieBreak = true;
 bool inTieBreak = false;
 bool matchWon = false;
+bool darkTheme = false;
 
 class Tennis extends StatefulWidget {
   @override
-  createState() => new TennisState();
+  createState() {
+    getSharedPreferences();
+    return new TennisState();
+  }
+
+  getSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    darkTheme = prefs.getBool("dark");
+    if (darkTheme == null) darkTheme = false;
+    periodWin = prefs.getInt("TennisWin");
+    if (periodWin == null) periodWin = 6;
+    periodNumber = prefs.getInt("TennisNumber");
+    if (periodNumber == null) periodNumber = 3;
+    tieBreak = prefs.getBool("TennisTie");
+    if (tieBreak == null) tieBreak = true;
+  }
 }
 
 class TennisState extends State<Tennis> {
@@ -52,7 +70,8 @@ class TennisState extends State<Tennis> {
         },
         child: new Text(
           "IMPOSTAZIONI",
-          style: new TextStyle(color: Colors.white),
+          style:
+          new TextStyle(color: (darkTheme) ? Colors.black : Colors.white),
         ),
       ),
     ];
@@ -64,17 +83,29 @@ class TennisState extends State<Tennis> {
           },
           child: new Text(
             "NUOVA",
-            style: new TextStyle(color: Colors.white),
+            style:
+            new TextStyle(color: (darkTheme) ? Colors.black : Colors.white),
           ),
         ),
       );
     }
     return new Scaffold(
       appBar: new AppBar(
+        leading: new BackButton(
+          color: (darkTheme) ? Colors.black : Colors.white,
+        ),
+        textTheme: new TextTheme(
+            title: new TextStyle(
+                color: (darkTheme) ? Colors.black : Colors.white,
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold)),
         title: new Text('Tennis'),
         actions: actions,
       ),
       body: _buildTennis(),
+      backgroundColor: (darkTheme)
+          ? Color.fromARGB(255, 50, 50, 50)
+          : Color.fromARGB(255, 250, 250, 250),
     );
   }
 
@@ -264,11 +295,13 @@ class TennisScoreState extends State<TennisScore> {
               textAlign: TextAlign.center,
               decoration: new InputDecoration(
                 hintText: team.name,
+                hintStyle: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               ),
               style: new TextStyle(
                   fontSize: 30.0,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black54),
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             ),
           ),
         ),
@@ -282,11 +315,23 @@ class TennisScoreState extends State<TennisScore> {
               },
               child: new Text(
                 "Punto",
-                style: new TextStyle(fontSize: 25.0),
+                style: new TextStyle(
+                    fontSize: 25.0,
+
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               )),
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt("TennisWin", periodWin);
+    prefs.setInt("TennisNumber", periodNumber);
+    prefs.setBool("TennisTie", tieBreak);
+    super.dispose();
   }
 
   void _ensureVisible() {
@@ -295,7 +340,11 @@ class TennisScoreState extends State<TennisScore> {
 
   void nameChange() {
     if (_controller.text.isNotEmpty) {
-      team.setName(_controller.text);
+      if (_controller.text.length <= 20) {
+        team.setName(_controller.text);
+      } else {
+        _controller.text = team.name;
+      }
     } else {
       team.setName("Giocatore ${team.index}");
     }
@@ -331,7 +380,11 @@ class TennisScorePeriodState extends State<TennisScorePeriod> {
         child: new Text(
           scores[i].team1.toString(),
           textAlign: TextAlign.center,
-          style: new TextStyle(fontSize: 20.0),
+
+          style: new TextStyle(
+              fontSize: 20.0,
+
+              color: (darkTheme) ? Colors.blue : Colors.black),
         ),
       ));
     List<Widget> scoresTeam2 = <Widget>[];
@@ -340,7 +393,10 @@ class TennisScorePeriodState extends State<TennisScorePeriod> {
         child: new Text(
           scores[i].team2.toString(),
           textAlign: TextAlign.center,
-          style: new TextStyle(fontSize: 20.0),
+          style: new TextStyle(
+              fontSize: 20.0,
+
+              color: (darkTheme) ? Colors.blue : Colors.black),
         ),
       ));
     return new Column(
@@ -355,7 +411,10 @@ class TennisScorePeriodState extends State<TennisScorePeriod> {
               child: new Text(
                 team1.name,
                 textAlign: TextAlign.center,
-                style: new TextStyle(fontSize: 20.0),
+                style: new TextStyle(
+                    fontSize: 20.0,
+
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               ),
             ),
             new Expanded(
@@ -377,7 +436,10 @@ class TennisScorePeriodState extends State<TennisScorePeriod> {
               child: new Text(
                 team2.name,
                 textAlign: TextAlign.center,
-                style: new TextStyle(fontSize: 20.0),
+                style: new TextStyle(
+                    fontSize: 20.0,
+
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               ),
             ),
             new Expanded(
@@ -466,20 +528,40 @@ class TennisSettingsState extends State<TennisSettings> {
       }
     });
     return new Scaffold(
-      appBar: new AppBar(),
+      appBar: new AppBar(
+        leading: new BackButton(
+          color: (darkTheme) ? Colors.black : Colors.white,
+        ),
+        textTheme: new TextTheme(
+            title: new TextStyle(
+                color: (darkTheme) ? Colors.black : Colors.white,
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold)),
+      ),
+      backgroundColor: (darkTheme)
+          ? Color.fromARGB(255, 50, 50, 50)
+          : Color.fromARGB(255, 250, 250, 250),
       body: new Column(children: <Widget>[
         new ListTile(
-            trailing: new Text("Giochi per Set"),
+            trailing: new Text(
+              "Giochi per Set",
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
+            ),
             title: new TextField(
-              keyboardType: TextInputType.number,
-              decoration: new InputDecoration(
-                hintText: periodWin.toString(),
-              ),
-              controller: _periodWin,
-            )),
+                keyboardType: TextInputType.number,
+                decoration: new InputDecoration(
+                    hintText: periodWin.toString(),
+                    hintStyle: new TextStyle(
+                        color: (darkTheme) ? Colors.blue : Colors.black)),
+                controller: _periodWin,
+                style: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black))),
         new ListTile(
-            trailing: new Text("Tie Break"),
-            title: new Checkbox(
+            trailing: new Text("Tie Break",
+                style: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black)),
+            title: new Switch(
               value: tieBreak,
               onChanged: (value) {
                 setState(() {
@@ -488,13 +570,20 @@ class TennisSettingsState extends State<TennisSettings> {
               },
             )),
         new ListTile(
-            trailing: new Text("Al Meglio di (# set)"),
+            trailing: new Text("Al Meglio di (# set)",
+                style: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black)),
             title: new TextField(
               keyboardType: TextInputType.number,
               decoration: new InputDecoration(
                 hintText: periodNumber.toString(),
+                hintStyle: new TextStyle(
+                    color: (darkTheme) ? Colors.blue : Colors.black),
               ),
               controller: _periodNumber,
+              style: new TextStyle(
+
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             )),
       ]),
     );

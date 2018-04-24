@@ -3,6 +3,7 @@ import 'dart:math' as Math;
 import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/util.dart' as Util;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final List<Player> players = <Player>[
   new Player("Giocatore 1", 0),
@@ -10,70 +11,148 @@ final List<Player> players = <Player>[
 ];
 final List<Moves> moves = <Moves>[];
 final List<bool> ballState = new List.filled(15, true);
+bool darkTheme = false;
 
 class Biliardo extends StatefulWidget {
   @override
   createState() {
+
     moves.clear();
     for (int i = 0; i < ballState.length; i++) {
       ballState[i] = true;
     }
 
     try {
-      players.clear();
-      players.add(new Player("Giocatore 1", 0));
-      players.add(new Player("Giocatore 2", 0));
+      if (players.isEmpty) {
+        players.add(new Player("Giocatore 1", 0));
+        players.add(new Player("Giocatore 2", 0));
+      } else {
+        for (Player pl in players) {
+          pl.value = 0;
+        }
+      }
     } catch (b) {
       print(b);
     }
     return new BiliardoState();
   }
+
+  getSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    darkTheme = prefs.getBool("dark");
+    if (darkTheme == null) darkTheme = false;
+    List<String> playersSaved = prefs.getStringList("BiliardoPlayers");
+    if (playersSaved.isNotEmpty) {
+      players.clear();
+      for (String p in playersSaved)
+        players.add(new Player(p, 0));
+    }
+  }
 }
 
 class BiliardoState extends State<Biliardo> {
-  int _players = 2;
   int _playerName = 2;
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+
       appBar: new AppBar(
+        leading: new BackButton(
+          color: (darkTheme) ? Colors.black : Colors.white,),
+        textTheme: new TextTheme(title: new TextStyle(
+            color: (darkTheme) ? Colors.black : Colors.white,
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold)),
         title: new Text('Biliardo'),
       ),
-      body: new Flex(direction: Axis.vertical,
-          children: <Widget>[buildBiliardo(), buildPlayers()]),
-      bottomNavigationBar: new BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          new BottomNavigationBarItem(
-              icon: new Icon(Icons.add), title: new Text("Nuovo Giocatore")),
-          new BottomNavigationBarItem(
-              icon: new Icon(Icons.arrow_back), title: new Text("Annulla")),
-          new BottomNavigationBarItem(
-              icon: new Icon(Icons.refresh), title: new Text("Reset")),
+      body: new Flex(
+        direction: Axis.vertical,
+        children: <Widget>[
+          buildBiliardo(),
+          buildPlayers(),
+          new Expanded(
+            child: new Container(
+              margin: EdgeInsets.all(12.0),
+              child: new Flex(
+                direction: Axis.horizontal,
+                children: <Widget>[
+                  new Expanded(
+                    child: new MaterialButton(
+                        onPressed: _addPlayer,
+                        child: new Column(children: <Widget>[
+                          new Icon(
+                            Icons.add,
+                            color: Colors.blue,
+                          ),
+                          new Center(
+                              child: new Text(
+                                "Nuovo Giocatore",
+                                textAlign: TextAlign.center,
+                                style: new TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ))
+                        ])),
+                  ),
+                  new Expanded(
+                    child: new MaterialButton(
+                        onPressed: (moves.length > 0) ? _annulla : null,
+                        child: new Column(children: <Widget>[
+                          new Icon(
+                            Icons.arrow_back,
+                            color: Colors.blue,
+                          ),
+                          new Text(
+                            "Annulla",
+                            style: new TextStyle(
+                              color: Colors.blue,
+                            ),
+                          )
+                        ])),
+                  ),
+                  new Expanded(
+                    child: new MaterialButton(
+                        onPressed: reset,
+                        child: new Column(children: <Widget>[
+                          new Icon(
+                            Icons.refresh,
+                            color: Colors.blue,
+                          ),
+                          new Text(
+                            "Reset",
+                            style: new TextStyle(
+                              color: Colors.blue,
+                            ),
+                          )
+                        ])),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
-        onTap: (item) {
-          if (item == 0) {
-            _addPlayer();
-          }
-          if (item == 1) {
-            if (moves.length > 0) {
-              _annulla();
-            } else {
-              null;
-            }
-          }
-          if (item == 2) {
-            reset();
-          }
-        },
       ),
+      backgroundColor: (darkTheme)
+          ? Color.fromARGB(255, 50, 50, 50)
+          : Color.fromARGB(255, 250, 250, 250),
     );
+  }
+
+  @override
+  void dispose() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> pl = new List();
+    for (Player p in players)
+      pl.add(p.name);
+    prefs.setStringList("BiliardoPlayers", pl);
+    super.dispose();
   }
 
   void _addPlayer() {
     players.add(new Player("Giocatore ${_playerName + 1}", 0));
     setState(() {
-      _players++;
       _playerName++;
     });
   }
@@ -82,7 +161,6 @@ class BiliardoState extends State<Biliardo> {
     setState(() {
       Player player = players[index];
       players.removeAt(index);
-      _players--;
       List<int> indexes = new List();
       for (int i = 0; i < moves.length; i++) {
         if (moves[i].player == index) {
@@ -125,8 +203,11 @@ class BiliardoState extends State<Biliardo> {
 
   Widget buildBiliardo() {
     return new Expanded(
+      flex: 4,
       child: new GridView.count(
         crossAxisCount: 4,
+        controller: new ScrollController(
+            initialScrollOffset: 0.0, keepScrollOffset: true),
         childAspectRatio: 1.0,
         padding: const EdgeInsets.fromLTRB(16.0, 25.0, 16.0, 30.0),
         children: <Widget>[
@@ -238,7 +319,7 @@ class BiliardoState extends State<Biliardo> {
             rePaint,
           );
         },
-        itemCount: _players,
+        itemCount: players.length,
       ),
     );
   }
@@ -332,7 +413,11 @@ class BuildPlayerState extends State<BuildPlayer> {
         return new Container(
           width: Math.max((width - 32.0) / players.length, 110.0),
           decoration: new BoxDecoration(
-            color: accepted.isEmpty ? null : Colors.grey.shade200,
+            color: accepted.isEmpty
+                ? null
+                : (darkTheme
+                ? accepted.last.color.withAlpha(50)
+                : Colors.grey.shade200),
             border: new Border.all(
                 width: 3.0,
                 color: accepted.isEmpty
@@ -346,6 +431,8 @@ class BuildPlayerState extends State<BuildPlayer> {
                   child: new Center(
                     child: new Text(
                       players[index].value.toString(),
+                      style: new TextStyle(
+                          color: darkTheme ? Colors.blue : Colors.black),
                     ),
                   )),
               new TextField(
@@ -354,7 +441,11 @@ class BuildPlayerState extends State<BuildPlayer> {
                 focusNode: focusNode,
                 decoration: new InputDecoration(
                   hintText: players[index].name,
+                  hintStyle: new TextStyle(
+                      color: darkTheme ? Colors.blueAccent : Colors.black),
                 ),
+                style: new TextStyle(
+                    color: darkTheme ? Colors.blue : Colors.black),
               ),
             ],
           ),
@@ -378,9 +469,13 @@ class BuildPlayerState extends State<BuildPlayer> {
 
   void nameChange() {
     if (_controller.text.isNotEmpty) {
-      players[index].setName(_controller.text);
+      if (_controller.text.length <= 20) {
+        players[index].setName(_controller.text);
+      } else {
+        _controller.text = players[index].name;
+      }
     } else {
-      players[index].setName("Giocatore ${index + 1}");
+      players[index].setName("Giocatore $index");
     }
   }
 }
