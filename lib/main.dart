@@ -37,8 +37,6 @@ class ParentState extends State<Parent> {
         title: 'Segnapunti',
         theme: new ThemeData(
             primaryColor: Colors.blue,
-            splashColor: Colors.blue,
-            accentColor: Colors.black
         ),
         //passaggio importante, semplificano le chiamate per il navigator.push
         routes: <String, WidgetBuilder>{

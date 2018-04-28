@@ -2,8 +2,13 @@ import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/util.dart' as Util;
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 bool darkTheme = false;
+final List<ClassicPlayer> play = <ClassicPlayer>[
+  new ClassicPlayer("Giocatore 1", minValue),
+  new ClassicPlayer("Giocatore 2", minValue),
+];
 
 class Classic extends StatefulWidget {
   @override
@@ -12,12 +17,22 @@ class Classic extends StatefulWidget {
 
     return new ClassicState();
   }
+
+  getSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    darkTheme = prefs.getBool("dark");
+    if (darkTheme == null) darkTheme = false;
+    List<String> playersSaved = prefs.getStringList("BiliardoPlayers");
+    if (playersSaved.isNotEmpty) {
+      play.clear();
+      for (String p in playersSaved)
+        play.add(new ClassicPlayer(p, minValue));
+    }
+  }
 }
 
-final List<ClassicPlayer> play = <ClassicPlayer>[
-  new ClassicPlayer("Giocatore 1", minValue),
-  new ClassicPlayer("Giocatore 2", minValue),
-];
+
 
 int minValue = 0;
 int maxValue = 60;
@@ -41,6 +56,13 @@ class ClassicState extends State<Classic> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
+        leading: new BackButton(
+          color: (darkTheme) ? Colors.black : Colors.white,),
+        textTheme: new TextTheme(title: new TextStyle(
+            color: (darkTheme) ? Colors.black : Colors.white,
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold)),
+
         title: new Text('Classico'),
         actions: <Widget>[
           new MaterialButton(
@@ -53,12 +75,14 @@ class ClassicState extends State<Classic> {
                 },
                 child: new Text(
                   "IMPOSTAZIONI",
-                  style: new TextStyle(color: Colors.white),
                 ),
               ))
         ],
       ),
       body: _buildText(),
+      backgroundColor: (darkTheme)
+          ? Color.fromARGB(255, 50, 50, 50)
+          : Color.fromARGB(255, 250, 250, 250),
       floatingActionButton: new FloatingActionButton(
           onPressed: _addPlayer, child: new Icon(Icons.add)),
     );
@@ -136,8 +160,12 @@ class BuildRowState extends State<BuildRow> {
             child: new TextField(
               controller: _controller,
               focusNode: focusNode,
+              style: new TextStyle(
+                  color: darkTheme ? Colors.blue : Colors.black),
               decoration: new InputDecoration(
                 hintText: play[index].name,
+                hintStyle: new TextStyle(
+                    color: darkTheme ? Colors.blue : Colors.black),
               ),
             ),
           ),
@@ -248,7 +276,7 @@ class ClassicSettings extends AlertDialog {
             context: context,
             builder: (context) =>
             new AlertDialog(
-              title: new Text("Valore non valido"),
+              title: new Text("Valore non valido",),
               content: new Text(
                   "Il valore minimo non può essere maggiore del massimo"),
               actions: <Widget>[
@@ -289,7 +317,16 @@ class ClassicSettings extends AlertDialog {
       }
     });
     return new Scaffold(
-      appBar: new AppBar(),
+      backgroundColor: (darkTheme)
+          ? Color.fromARGB(255, 50, 50, 50)
+          : Color.fromARGB(255, 250, 250, 250),
+      appBar: new AppBar(leading: new BackButton(
+        color: (darkTheme) ? Colors.black : Colors.white,),
+        textTheme: new TextTheme(title: new TextStyle(
+            color: (darkTheme) ? Colors.black : Colors.white,
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold)),
+      ),
       body: new Column(children: <Widget>[
         new Container(
           child: new ListTile(
@@ -297,20 +334,30 @@ class ClassicSettings extends AlertDialog {
               keyboardType: TextInputType.number,
               decoration: new InputDecoration(
                 hintText: minValue.toString(),
+                hintStyle: new TextStyle(
+                    color: darkTheme ? Colors.blue : Colors.black),
               ),
+              style: new TextStyle(
+                  color: darkTheme ? Colors.blue : Colors.black),
               controller: _mincontroller,
             ),
-            trailing: new Text("Valore minimo"),
+            trailing: new Text("Valore minimo", style: new TextStyle(
+                color: darkTheme ? Colors.blue : Colors.black),),
           ),
         ),
         new ListTile(
-            trailing: new Text("Valore massimo"),
+            trailing: new Text("Valore massimo", style: new TextStyle(
+                color: darkTheme ? Colors.blue : Colors.black),),
             title: new TextField(
               keyboardType: TextInputType.number,
               decoration: new InputDecoration(
                 hintText: maxValue.toString(),
+                hintStyle: new TextStyle(
+                    color: darkTheme ? Colors.blue : Colors.black),
               ),
               controller: _maxcontroller,
+              style: new TextStyle(
+                  color: darkTheme ? Colors.blue : Colors.black),
             )),
       ]),
     );
