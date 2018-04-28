@@ -14,7 +14,6 @@ class Classic extends StatefulWidget {
   @override
   createState() {
     getSharedPreferences();
-
     return new ClassicState();
   }
 

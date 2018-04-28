@@ -24,7 +24,6 @@ class Parent extends StatefulWidget {
 }
 
 class ParentState extends State<Parent> {
-
   ParentState() {
     getSharedPreferences();
   }

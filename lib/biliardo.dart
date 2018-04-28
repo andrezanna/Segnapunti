@@ -134,6 +134,7 @@ class BiliardoState extends State<Biliardo> {
           ),
         ],
       ),
+
       backgroundColor: (darkTheme)
           ? Color.fromARGB(255, 50, 50, 50)
           : Color.fromARGB(255, 250, 250, 250),
