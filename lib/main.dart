@@ -107,10 +107,10 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image(
+                  new Image.asset(
                     //parte importante, definire gli asset per trovarli più velocemnte
                     //si inseriscono nel pubspec.yaml
-                    image: new AssetImage('/images/p8.png'),
+                    'images/p8.png',
                     height: 100.0,
                     width: 100.0,
                   ),
@@ -129,8 +129,7 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image(
-                    image: new AssetImage('/images/basket.png'),
+                  new Image.asset('images/basket.png',
                     height: 100.0,
                     width: 100.0,
                   ),
@@ -149,8 +148,7 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image(
-                    image: new AssetImage('/images/volley.png'),
+                  new Image.asset('images/volley.png',
                     height: 100.0,
                     width: 100.0,
                   ),
@@ -169,8 +167,7 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image(
-                    image: new AssetImage('/images/tennis.png'),
+                  new Image.asset('images/tennis.png',
                     height: 100.0,
                     width: 100.0,
                   ),
@@ -189,8 +186,7 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image(
-                    image: new AssetImage('/images/rugby.png'),
+                  new Image.asset('images/rugby.png',
                     height: 100.0,
                     width: 100.0,
                   ),
@@ -209,8 +205,7 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image(
-                    image: new AssetImage('/images/numbers.png'),
+                  new Image.asset('images/numbers.png',
                     height: 100.0,
                     width: 100.0,
                   ),

@@ -1,7 +1,6 @@
 import 'dart:math' as Math;
 
 import 'package:Segnapunti/player.dart';
-import 'package:Segnapunti/util.dart' as Util;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,7 +15,7 @@ bool darkTheme = false;
 class Biliardo extends StatefulWidget {
   @override
   createState() {
-
+    getSharedPreferences();
     moves.clear();
     for (int i = 0; i < ballState.length; i++) {
       ballState[i] = true;
@@ -53,27 +52,29 @@ class Biliardo extends StatefulWidget {
 
 class BiliardoState extends State<Biliardo> {
   int _playerName = 2;
+  SharedPreferences prefs;
 
   @override
   Widget build(BuildContext context) {
+    getSharedPreferences();
     return new Scaffold(
-
       appBar: new AppBar(
         leading: new BackButton(
-          color: (darkTheme) ? Colors.black : Colors.white,),
-        textTheme: new TextTheme(title: new TextStyle(
-            color: (darkTheme) ? Colors.black : Colors.white,
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold)),
+          color: (darkTheme) ? Colors.black : Colors.white,
+        ),
+        textTheme: new TextTheme(
+            title: new TextStyle(
+                color: (darkTheme) ? Colors.black : Colors.white,
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold)),
         title: new Text('Biliardo'),
       ),
-      body: new Flex(
-        direction: Axis.vertical,
-        children: <Widget>[
-          buildBiliardo(),
-          buildPlayers(),
-          new Expanded(
-            child: new Container(
+      body: new ListView(
+
+          children: <Widget>[
+            buildBiliardo(),
+            buildPlayers(),
+            new Container(
               margin: EdgeInsets.all(12.0),
               child: new Flex(
                 direction: Axis.horizontal,
@@ -131,9 +132,9 @@ class BiliardoState extends State<Biliardo> {
                 ],
               ),
             ),
-          ),
-        ],
-      ),
+
+
+          ]),
 
       backgroundColor: (darkTheme)
           ? Color.fromARGB(255, 50, 50, 50)
@@ -141,13 +142,20 @@ class BiliardoState extends State<Biliardo> {
     );
   }
 
+  void getSharedPreferences() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
   @override
-  void dispose() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  void dispose() {
+    print("dispose");
     List<String> pl = new List();
-    for (Player p in players)
+    for (Player p in players) {
       pl.add(p.name);
+      print(p.name);
+    }
     prefs.setStringList("BiliardoPlayers", pl);
+    print("pref set");
     super.dispose();
   }
 
@@ -203,9 +211,8 @@ class BiliardoState extends State<Biliardo> {
   }
 
   Widget buildBiliardo() {
-    return new Expanded(
-      flex: 4,
-      child: new GridView.count(
+    return new GridView.count(
+      shrinkWrap: true,
         crossAxisCount: 4,
         controller: new ScrollController(
             initialScrollOffset: 0.0, keepScrollOffset: true),
@@ -214,81 +221,81 @@ class BiliardoState extends State<Biliardo> {
         children: <Widget>[
           new MovableBall(
             1,
-            '/images/p1.png',
+            'images/p1.png',
             Colors.yellow,
           ),
           new MovableBall(
             2,
-            '/images/p2.png',
+            'images/p2.png',
             Colors.blue,
           ),
           new MovableBall(
             3,
-            '/images/p3.png',
+            'images/p3.png',
             Colors.red,
           ),
           new MovableBall(
             4,
-            '/images/p4.png',
+            'images/p4.png',
             Colors.purple,
           ),
           new MovableBall(
             5,
-            '/images/p5.png',
+            'images/p5.png',
             Colors.orange,
           ),
           new MovableBall(
             6,
-            '/images/p6.png',
+            'images/p6.png',
             Colors.green,
           ),
           new MovableBall(
             7,
-            '/images/p7.png',
+            'images/p7.png',
             Colors.brown,
           ),
           new MovableBall(
             8,
-            '/images/p8.png',
+            'images/p8.png',
             Colors.black,
           ),
           new MovableBall(
             9,
-            '/images/p9.png',
+            'images/p9.png',
             Colors.yellow,
           ),
           new MovableBall(
             10,
-            '/images/p10.png',
+            'images/p10.png',
             Colors.blue,
           ),
           new MovableBall(
             11,
-            '/images/p11.png',
+            'images/p11.png',
             Colors.red,
           ),
           new MovableBall(
             12,
-            '/images/p12.png',
+            'images/p12.png',
             Colors.purple,
           ),
           new MovableBall(
             13,
-            '/images/p13.png',
+            'images/p13.png',
             Colors.orange,
           ),
           new MovableBall(
             14,
-            '/images/p14.png',
+            'images/p14.png',
             Colors.green,
           ),
           new MovableBall(
             15,
-            '/images/p15.png',
+            'images/p15.png',
             Colors.brown,
           ),
         ],
-      ),
+
     );
   }
 
@@ -385,16 +392,13 @@ class BuildPlayerState extends State<BuildPlayer> {
 
   //Approccio child state, parent state, mixed state
   final ValueChanged<int> removePlayer;
+  final int index;
 
   final ValueChanged<void> onChanged;
-  final TextEditingController _controller = new TextEditingController();
-  FocusNode focusNode = new FocusNode();
-  final int index;
+  TextEditingController _controller;
 
   @override
   Widget build(BuildContext context) {
-    _controller.addListener(nameChange);
-    focusNode.addListener(_ensureVisible);
     double width = MediaQuery
         .of(context)
         .size
@@ -437,14 +441,10 @@ class BuildPlayerState extends State<BuildPlayer> {
                     ),
                   )),
               new TextField(
+
                 controller: _controller,
                 textAlign: TextAlign.center,
-                focusNode: focusNode,
-                decoration: new InputDecoration(
-                  hintText: players[index].name,
-                  hintStyle: new TextStyle(
-                      color: darkTheme ? Colors.blueAccent : Colors.black),
-                ),
+
                 style: new TextStyle(
                     color: darkTheme ? Colors.blue : Colors.black),
               ),
@@ -464,21 +464,7 @@ class BuildPlayerState extends State<BuildPlayer> {
     });
   }
 
-  void _ensureVisible() {
-    Util.ensureVisible(context, focusNode);
-  }
 
-  void nameChange() {
-    if (_controller.text.isNotEmpty) {
-      if (_controller.text.length <= 20) {
-        players[index].setName(_controller.text);
-      } else {
-        _controller.text = players[index].name;
-      }
-    } else {
-      players[index].setName("Giocatore $index");
-    }
-  }
 }
 
 class MovableBall extends StatefulWidget {

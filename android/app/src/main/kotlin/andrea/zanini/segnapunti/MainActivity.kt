@@ -1,4 +1,4 @@
-package com.yourcompany.flutterapp
+package andrea.zanini.segnapunti
 
 import android.os.Bundle
 
