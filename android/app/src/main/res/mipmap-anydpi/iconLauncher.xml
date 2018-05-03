@@ -1,0 +1,4 @@
+<adaptive-icon xmlns:android="http://schemas.android.com/tools">
+    <background android:drawable="@color/accent"/>
+    <foreground android:drawable="@mipmap/ic_launcher"/>
+</adaptive-icon>
