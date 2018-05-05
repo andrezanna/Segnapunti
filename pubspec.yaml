@@ -54,6 +54,7 @@ flutter:
     - images/tennis.png
     - images/rugby.png
     - images/numbers.png
+    - icon/apple.png
   fonts:
     - family: ShotClock
       fonts:

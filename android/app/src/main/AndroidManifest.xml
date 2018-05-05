@@ -15,7 +15,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Segnapunti"
-        android:icon="@mipmap/iconLauncher">
+        android:icon="@mipmap/icon_launcher">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

@@ -435,7 +435,7 @@ class BasketSettings extends StatelessWidget {
     _periodLength.addListener(() {
       if (_periodLength.text.isNotEmpty) {
         int newValue = int.parse(_periodLength.text.toString());
-        if (newValue > 0) {
+        if (newValue >= 0) {
           periodLength = newValue;
           stopwatch.reset();
         } else if (!(shown)) {
@@ -457,7 +457,6 @@ class BasketSettings extends StatelessWidget {
                   )
                 ],
               ));
-          shown = false;
         }
       }
     });
@@ -484,7 +483,6 @@ class BasketSettings extends StatelessWidget {
                   )
                 ],
               ));
-          shown = false;
         }
       }
     });
@@ -512,7 +510,6 @@ class BasketSettings extends StatelessWidget {
                   )
                 ],
               ));
-          shown = false;
         }
       }
     });

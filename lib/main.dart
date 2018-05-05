@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:Segnapunti/basket.dart';
 import 'package:Segnapunti/biliardo.dart';
 import 'package:Segnapunti/classic.dart';
@@ -24,9 +27,14 @@ class Parent extends StatefulWidget {
 }
 
 class ParentState extends State<Parent> {
+  static const platform =
+  const MethodChannel('andrea.zanini.segnapunti/system_version');
+
   ParentState() {
-    getSharedPreferences();
+    _getSystemVersion();
   }
+
+  String _systemVersion = 'Sistema sconosciuto';
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +43,7 @@ class ParentState extends State<Parent> {
     return new MaterialApp(
         title: 'Segnapunti',
         theme: new ThemeData(
-            primaryColor: Colors.blue,
+          primaryColor: Colors.blue,
         ),
         //passaggio importante, semplificano le chiamate per il navigator.push
         routes: <String, WidgetBuilder>{
@@ -76,7 +84,29 @@ class ParentState extends State<Parent> {
           backgroundColor: (darkTheme)
               ? Color.fromARGB(255, 50, 50, 50)
               : Color.fromARGB(255, 250, 250, 250),
+          bottomNavigationBar: new Flex(direction: Axis.horizontal,
+              children: <Widget>[(Platform.isAndroid)
+                  ? new Expanded(child: new Icon(Icons.android, size: 32.0,))
+                  : new Expanded(child: new Image.asset(
+                "icon/apple.png", width: 32.0, height: 32.0,)),
+              new Expanded(child: new Text(_systemVersion))
+              ]),
+
         ));
+  }
+
+  Future<Null> _getSystemVersion() async {
+    String systemVersion;
+    try {
+      final String result = await platform.invokeMethod('getSystemVersion');
+      systemVersion = 'System Version: $result ';
+    } on PlatformException catch (e) {
+      systemVersion = "Failed to get system version: '${e.message}'.";
+    }
+
+    setState(() {
+      _systemVersion = systemVersion;
+    });
   }
 
   _saveValues(bool value) async {
@@ -129,7 +159,8 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image.asset('images/basket.png',
+                  new Image.asset(
+                    'images/basket.png',
                     height: 100.0,
                     width: 100.0,
                   ),
@@ -148,7 +179,8 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image.asset('images/volley.png',
+                  new Image.asset(
+                    'images/volley.png',
                     height: 100.0,
                     width: 100.0,
                   ),
@@ -167,7 +199,8 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image.asset('images/tennis.png',
+                  new Image.asset(
+                    'images/tennis.png',
                     height: 100.0,
                     width: 100.0,
                   ),
@@ -186,7 +219,8 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image.asset('images/rugby.png',
+                  new Image.asset(
+                    'images/rugby.png',
                     height: 100.0,
                     width: 100.0,
                   ),
@@ -205,7 +239,8 @@ class MyApp extends StatelessWidget {
               },
               child: new Column(
                 children: <Widget>[
-                  new Image.asset('images/numbers.png',
+                  new Image.asset(
+                    'images/numbers.png',
                     height: 100.0,
                     width: 100.0,
                   ),
