@@ -84,14 +84,22 @@ class ParentState extends State<Parent> {
           backgroundColor: (darkTheme)
               ? Color.fromARGB(255, 50, 50, 50)
               : Color.fromARGB(255, 250, 250, 250),
-          bottomNavigationBar: new Flex(direction: Axis.horizontal,
-              children: <Widget>[(Platform.isAndroid)
-                  ? new Expanded(child: new Icon(Icons.android, size: 32.0,))
-                  : new Expanded(child: new Image.asset(
-                "icon/apple.png", width: 32.0, height: 32.0,)),
-              new Expanded(child: new Text(_systemVersion))
-              ]),
-
+          bottomNavigationBar:
+          new Flex(direction: Axis.horizontal, children: <Widget>[
+            (Platform.isAndroid)
+                ? new Expanded(
+                child: new Icon(
+                  Icons.android,
+                  size: 32.0,
+                ))
+                : new Expanded(
+                child: new Image.asset(
+                  "icon/apple.png",
+                  width: 32.0,
+                  height: 32.0,
+                )),
+            new Expanded(child: new Text(_systemVersion))
+          ]),
         ));
   }
 
@@ -126,134 +134,232 @@ class ParentState extends State<Parent> {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery
+        .of(context)
+        .size
+        .width;
     return new Expanded(
-      child: new GridView.count(
-          crossAxisCount: 2,
-          padding: const EdgeInsets.fromLTRB(16.0, 25.0, 16.0, 4.0),
-          children: <Widget>[
-            new MaterialButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/biliardo');
-              },
-              child: new Column(
-                children: <Widget>[
-                  new Image.asset(
-                    //parte importante, definire gli asset per trovarli più velocemnte
-                    //si inseriscono nel pubspec.yaml
-                    'images/p8.png',
-                    height: 100.0,
-                    width: 100.0,
-                  ),
-                  new Text(
-                    "BILIARDO",
-                    style: new TextStyle(
-                      color: (darkTheme) ? Colors.blue : Colors.black,
+      child: new Flex(direction: Axis.horizontal, children: <Widget>[
+        new Expanded(
+          child: new Flex(
+            direction: Axis.vertical,
+            children: <Widget>[
+              new Expanded(
+                child: new Center(
+                  child: new MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/biliardo');
+                    },
+                    child: new Padding(
+                      padding: new EdgeInsets.all(width > 600 ? 64.0 : 16.0),
+                      child: new Flex(
+                        direction: Axis.vertical,
+                        children: <Widget>[
+                          new Container(
+                            child: new Expanded(
+                              flex: 3,
+                              child: new Image.asset(
+                                //parte importante, definire gli asset per trovarli più velocemnte
+                                //si inseriscono nel pubspec.yaml
+                                'images/p8.png',
+                              ),
+                            ),
+                          ),
+                          new Expanded(
+                            child: new Text(
+                              "BILIARDO",
+                              style: new TextStyle(
+                                color: (darkTheme) ? Colors.blue : Colors.black,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  )
-                ],
-              ),
-            ),
-            new MaterialButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/basket');
-              },
-              child: new Column(
-                children: <Widget>[
-                  new Image.asset(
-                    'images/basket.png',
-                    height: 100.0,
-                    width: 100.0,
                   ),
-                  new Text(
-                    "BASKET",
-                    style: new TextStyle(
-                      color: (darkTheme) ? Colors.blue : Colors.black,
-                    ),
-                  )
-                ],
+                ),
               ),
-            ),
-            new MaterialButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/volley');
-              },
-              child: new Column(
-                children: <Widget>[
-                  new Image.asset(
-                    'images/volley.png',
-                    height: 100.0,
-                    width: 100.0,
+              new Expanded(
+                child: new Center(
+                  child: new MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/basket');
+                    },
+                    child: new Center(
+                      child: new Padding(
+                        padding: new EdgeInsets.all(width > 600 ? 64.0 : 16.0),
+                        child: new Flex(
+                          direction: Axis.vertical,
+                          children: <Widget>[
+                            new Expanded(
+                              flex: 3,
+                              child: new Image.asset(
+                                'images/basket.png',
+                              ),
+                            ),
+                            new Expanded(
+                              child: new Text(
+                                "BASKET",
+                                style: new TextStyle(
+                                  color:
+                                  (darkTheme) ? Colors.blue : Colors.black,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  new Text(
-                    "PALLAVOLO",
-                    style: new TextStyle(
-                      color: (darkTheme) ? Colors.blue : Colors.black,
-                    ),
-                  )
-                ],
+                ),
               ),
-            ),
-            new MaterialButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/tennis');
-              },
-              child: new Column(
-                children: <Widget>[
-                  new Image.asset(
-                    'images/tennis.png',
-                    height: 100.0,
-                    width: 100.0,
+              new Expanded(
+                child: new Center(
+                  child: new MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/volley');
+                    },
+                    child: new Center(
+                      child: new Padding(
+                        padding: new EdgeInsets.all(width > 600 ? 64.0 : 16.0),
+                        child: new Flex(
+                          direction: Axis.vertical,
+                          children: <Widget>[
+                            new Expanded(
+                              flex: 3,
+                              child: new Image.asset(
+                                'images/volley.png',
+                              ),
+                            ),
+                            new Expanded(
+                              child: new Text(
+                                "PALLAVOLO",
+                                style: new TextStyle(
+                                  color:
+                                  (darkTheme) ? Colors.blue : Colors.black,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  new Text(
-                    "TENNIS",
-                    style: new TextStyle(
-                      color: (darkTheme) ? Colors.blue : Colors.black,
-                    ),
-                  )
-                ],
+                ),
               ),
-            ),
-            new MaterialButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/rugby');
-              },
-              child: new Column(
-                children: <Widget>[
-                  new Image.asset(
-                    'images/rugby.png',
-                    height: 100.0,
-                    width: 100.0,
+            ],
+          ),
+        ),
+        new Expanded(
+          child: new Flex(
+            direction: Axis.vertical,
+            children: <Widget>[
+              new Expanded(
+                child: new Center(
+                  child: new MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/tennis');
+                    },
+                    child: new Center(
+                      child: new Padding(
+                        padding: new EdgeInsets.all(width > 600 ? 64.0 : 16.0),
+                        child: new Flex(
+                          direction: Axis.vertical,
+                          children: <Widget>[
+                            new Expanded(
+                              flex: 3,
+                              child: new Image.asset(
+                                'images/tennis.png',
+                              ),
+                            ),
+                            new Expanded(
+                              child: new Text(
+                                "TENNIS",
+                                style: new TextStyle(
+                                  color:
+                                  (darkTheme) ? Colors.blue : Colors.black,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  new Text(
-                    "RUGBY",
-                    style: new TextStyle(
-                      color: (darkTheme) ? Colors.blue : Colors.black,
-                    ),
-                  )
-                ],
+                ),
               ),
-            ),
-            new MaterialButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/classic');
-              },
-              child: new Column(
-                children: <Widget>[
-                  new Image.asset(
-                    'images/numbers.png',
-                    height: 100.0,
-                    width: 100.0,
+              new Expanded(
+                child: new Center(
+                  child: new MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/rugby');
+                    },
+                    child: new Center(
+                      child: new Padding(
+                        padding: new EdgeInsets.all(width > 600 ? 64.0 : 16.0),
+                        child: new Flex(
+                          direction: Axis.vertical,
+                          children: <Widget>[
+                            new Expanded(
+                              flex: 3,
+                              child: new Image.asset(
+                                'images/rugby.png',
+                              ),
+                            ),
+                            new Expanded(
+                              child: new Text(
+                                "RUGBY",
+                                style: new TextStyle(
+                                  color:
+                                  (darkTheme) ? Colors.blue : Colors.black,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  new Text(
-                    "CLASSICO",
-                    style: new TextStyle(
-                      color: (darkTheme) ? Colors.blue : Colors.black,
-                    ),
-                  )
-                ],
+                ),
               ),
-            ),
-          ]),
+              new Expanded(
+                child: new Center(
+                  child: new MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/classic');
+                    },
+                    child: new Center(
+                      child: new Padding(
+                        padding: new EdgeInsets.all(width > 600 ? 64.0 : 16.0),
+                        child: new Flex(
+                          direction: Axis.vertical,
+                          children: <Widget>[
+                            new Expanded(
+                              flex: 3,
+                              child: new Image.asset(
+                                'images/numbers.png',
+                              ),
+                            ),
+                            new Expanded(
+                              child: new Text(
+                                "CLASSICO",
+                                style: new TextStyle(
+                                  color:
+                                  (darkTheme) ? Colors.blue : Colors.black,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ]),
     );
   }
 }

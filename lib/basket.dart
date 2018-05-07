@@ -42,8 +42,8 @@ class Basket extends StatefulWidget {
 }
 
 class BasketState extends State<Basket> {
-  BasketTeam team1 = new BasketTeam("Casa", 0);
-  BasketTeam team2 = new BasketTeam("Trasferta", 0);
+  BasketTeam team1 = new BasketTeam("HOME", 0);
+  BasketTeam team2 = new BasketTeam("AWAY", 0);
   final List<Scores> scores = new List();
   Scores lastPeriod = new Scores(0, 0);
   SharedPreferences prefs;
@@ -104,7 +104,7 @@ class BasketState extends State<Basket> {
   }
 
   @override
-  void dispose() async {
+  void dispose() {
     try {
       super.dispose();
     } catch (b) {
@@ -243,47 +243,53 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
     return new Column(
       children: <Widget>[
         new Expanded(
-          child: new MaterialButton(
-            onPressed: () {
-              setState(() {
-                if (team.value > 0) team.value -= 1;
-              });
-            },
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                new Text(
-                  team.value.toString(),
-                  style: new TextStyle(
-                    color: Colors.red,
-                    fontFamily: "ShotClock",
-                    fontSize: 70.0,
+          flex: 2,
+          child: new FittedBox(
+            fit: BoxFit.cover,
+            child: new MaterialButton(
+              onPressed: () {
+                setState(() {
+                  if (team.value > 0) team.value -= 1;
+                });
+              },
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+
+                  new Text(
+                    team.value.toString(),
+                    style: new TextStyle(
+                      color: Colors.red,
+                      fontFamily: "ShotClock",
+                    ),
+                    textAlign: TextAlign.right,
                   ),
-                  textAlign: TextAlign.right,
-                ),
-                new Icon(
-                  (team.fouls >= teamFoulThreshold) ? Icons.brightness_1 : null,
-                  color: Colors.red,
-                  size: 10.0,
-                ),
-              ],
+
+                  new Icon(
+                    (team.fouls >= teamFoulThreshold)
+                        ? Icons.brightness_1
+                        : null,
+                    color: Colors.red,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
         new Expanded(
-          child: new Center(
+          child: new FittedBox(
             child: new Text(
               team.name,
               style: new TextStyle(
                 color: (darkTheme) ? Colors.blue : Colors.black,
-                fontSize: 30.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ),
         new Expanded(
-          child: new MaterialButton(
+          child: new FittedBox(
+            child: new MaterialButton(
               onPressed: () {
                 if (stopwatch.elapsedMilliseconds > 0 &&
                     stopwatch.elapsedMilliseconds < periodLength * 1000 * 60)
@@ -291,58 +297,66 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                     team.value += 1;
                   });
               },
+
               child: new Text(
                 "+1",
                 style: new TextStyle(
-                    fontSize: 25.0,
                     color: (darkTheme) ? Colors.blue : Colors.black),
-              )),
+              ),
+            ),
+          ),
         ),
         new Expanded(
-          child: new MaterialButton(
+          child: new FittedBox(
+            child: new MaterialButton(
               onPressed: () {
                 if (stopwatch.isRunning)
                   setState(() {
                     team.value += 2;
                   });
               },
+
               child: new Text(
                 "+2",
                 style: new TextStyle(
-                    fontSize: 25.0,
-
                     color: (darkTheme) ? Colors.blue : Colors.black),
-              )),
+              ),
+            ),
+          ),
         ),
         new Expanded(
-            child: new MaterialButton(
+            child: new FittedBox(
+              child: new MaterialButton(
                 onPressed: () {
                   if (stopwatch.isRunning)
                     setState(() {
                       team.value += 3;
                     });
                 },
+
                 child: new Text(
                   "+3",
                   style: new TextStyle(
-                      fontSize: 25.0,
-
                       color: (darkTheme) ? Colors.blue : Colors.black),
-                ))),
+                ),
+              ),
+            )),
         new Expanded(
-          child: new MaterialButton(
+          child: new FittedBox(
+            child: new MaterialButton(
               onPressed: () {
                 setState(() {
                   team.fouls += 1;
                 });
               },
+
               child: new Text(
                 "FALLO",
                 style: new TextStyle(
-                    fontSize: 25.0,
-
                     color: (darkTheme) ? Colors.blue : Colors.black),
-              )),
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -386,8 +400,6 @@ class TeamScorePeriodState extends State<TeamScorePeriod> {
                         scores[index].team1.toString(),
                         textAlign: TextAlign.center,
                         style: new TextStyle(
-                            fontSize: 20.0,
-
                             color: (darkTheme) ? Colors.blue : Colors.black),
                       ),
                     ),
@@ -410,7 +422,6 @@ class TeamScorePeriodState extends State<TeamScorePeriod> {
                         scores[index].team2.toString(),
                         textAlign: TextAlign.center,
                         style: new TextStyle(
-                            fontSize: 20.0,
 
                             color: (darkTheme) ? Colors.blue : Colors.black),
                       ),

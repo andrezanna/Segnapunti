@@ -36,8 +36,8 @@ class Rugby extends StatefulWidget {
 }
 
 class RugbyState extends State<Rugby> {
-  Player team1 = new Player("Casa", 0);
-  Player team2 = new Player("Trasferta", 0);
+  Player team1 = new Player("HOME", 0);
+  Player team2 = new Player("AWAY", 0);
 
   final List<Scores> scores = new List();
   Scores lastPeriod = new Scores(0, 0);
@@ -241,7 +241,7 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
           ),
         ),
         new Expanded(
-          child: new Center(
+          child: new FittedBox(
             child: new Text(
               team.name,
               style: new TextStyle(fontSize: 30.0,
