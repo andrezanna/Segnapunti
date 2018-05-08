@@ -270,13 +270,15 @@ class TennisScoreState extends State<TennisScore> {
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                new Text(
-                  (inTieBreak) ? team.value.toString() : points[team.value],
-                  style: new TextStyle(
-                    color: Colors.red,
-                    fontSize: 40.0,
+                new Center(
+                  child: new Text(
+                    (inTieBreak) ? team.value.toString() : points[team.value],
+                    style: new TextStyle(
+                      color: Colors.red,
+                      fontSize: 40.0,
+                    ),
+                    textAlign: TextAlign.right,
                   ),
-                  textAlign: TextAlign.right,
                 ),
                 new Icon(
                   (team.service) ? Icons.brightness_1 : null,
@@ -306,20 +308,26 @@ class TennisScoreState extends State<TennisScore> {
           ),
         ),
         new Expanded(
-          child: new MaterialButton(
+          child: new FittedBox(
+            fit: BoxFit.fill,
+            child: new MaterialButton(
               onPressed: () {
                 setState(() {
                   if (!matchWon) team.value += 1;
                 });
                 pointScored(team);
               },
-              child: new Text(
-                "Punto",
-                style: new TextStyle(
-                    fontSize: 25.0,
+              child: new Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: new Text(
+                  "Punto",
+                  style: new TextStyle(
 
-                    color: (darkTheme) ? Colors.blue : Colors.black),
-              )),
+                      color: (darkTheme) ? Colors.blue : Colors.black),
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );

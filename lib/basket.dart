@@ -242,27 +242,32 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
   Widget build(BuildContext context) {
     return new Column(
       children: <Widget>[
-        new Expanded(
-          flex: 2,
-          child: new FittedBox(
-            fit: BoxFit.cover,
-            child: new MaterialButton(
+
+        new MaterialButton(
               onPressed: () {
                 setState(() {
                   if (team.value > 0) team.value -= 1;
                 });
               },
-              child: new Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+          child: new Flex(
+            direction: Axis.horizontal,
                 children: <Widget>[
 
-                  new Text(
-                    team.value.toString(),
-                    style: new TextStyle(
-                      color: Colors.red,
-                      fontFamily: "ShotClock",
+                  new Expanded(
+
+                    child: new Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: new FittedBox(
+                        child: new Text(
+                          team.value.toString(),
+                          style: new TextStyle(
+                            color: Colors.red,
+                            fontFamily: "ShotClock",
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
                     ),
-                    textAlign: TextAlign.right,
                   ),
 
                   new Icon(
@@ -274,8 +279,7 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                 ],
               ),
             ),
-          ),
-        ),
+
         new Expanded(
           child: new FittedBox(
             child: new Text(
