@@ -242,44 +242,36 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
   Widget build(BuildContext context) {
     return new Column(
       children: <Widget>[
-
         new MaterialButton(
-              onPressed: () {
-                setState(() {
-                  if (team.value > 0) team.value -= 1;
-                });
-              },
+          onPressed: () {
+            setState(() {
+              if (team.value > 0) team.value -= 1;
+            });
+          },
           child: new Flex(
             direction: Axis.horizontal,
-                children: <Widget>[
-
-                  new Expanded(
-
-                    child: new Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: new FittedBox(
-                        child: new Text(
-                          team.value.toString(),
-                          style: new TextStyle(
-                            color: Colors.red,
-                            fontFamily: "ShotClock",
-                          ),
-                          textAlign: TextAlign.right,
-                        ),
+            children: <Widget>[
+              new Expanded(
+                child: new Container(
+                  child: new FittedBox(
+                    child: new Text(
+                      team.value.toString().padLeft(3, '0'),
+                      style: new TextStyle(
+                        color: Colors.red,
+                        fontFamily: "ShotClock",
                       ),
+                      textAlign: TextAlign.right,
                     ),
-                  ),
+                  ),),
 
-                  new Icon(
-                    (team.fouls >= teamFoulThreshold)
-                        ? Icons.brightness_1
-                        : null,
-                    color: Colors.red,
-                  ),
-                ],
               ),
-            ),
-
+              new Icon(
+                (team.fouls >= teamFoulThreshold) ? Icons.brightness_1 : null,
+                color: Colors.red,
+              ),
+            ],
+          ),
+        ),
         new Expanded(
           child: new FittedBox(
             child: new Text(
@@ -301,7 +293,6 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                     team.value += 1;
                   });
               },
-
               child: new Text(
                 "+1",
                 style: new TextStyle(
@@ -319,7 +310,6 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                     team.value += 2;
                   });
               },
-
               child: new Text(
                 "+2",
                 style: new TextStyle(
@@ -337,7 +327,6 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                       team.value += 3;
                     });
                 },
-
                 child: new Text(
                   "+3",
                   style: new TextStyle(
@@ -353,7 +342,6 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                   team.fouls += 1;
                 });
               },
-
               child: new Text(
                 "FALLO",
                 style: new TextStyle(
@@ -426,7 +414,6 @@ class TeamScorePeriodState extends State<TeamScorePeriod> {
                         scores[index].team2.toString(),
                         textAlign: TextAlign.center,
                         style: new TextStyle(
-
                             color: (darkTheme) ? Colors.blue : Colors.black),
                       ),
                     ),
@@ -641,19 +628,20 @@ class TimerTextState extends State<TimerText> {
         timer.cancel();
         stopwatch.stop();
         onTimeEnd(null);
-        setState(() {
-          text = TimerTextFormatter.format(0, true);
-        });
       } else if (stopwatch.elapsedMilliseconds >= (qLength - 1) * 1000 * 60 &&
           !cb) {
         timer = new Timer.periodic(new Duration(milliseconds: 30), callback);
+
         cb = true;
       } else if (stopwatch.elapsedMilliseconds < (qLength - 1) * 1000 * 60 &&
           cb) {
         timer = new Timer.periodic(new Duration(milliseconds: 1000), callback);
+
         cb = false;
       }
-      setState(() {});
+      setState(() {
+
+      });
     }
   }
 
@@ -664,7 +652,9 @@ class TimerTextState extends State<TimerText> {
       qLength = periodLength;
     if (!running && stopwatch.elapsedMilliseconds < (qLength) * 1000 * 60) {
       stopwatch.start();
+      setState(() {
 
+      });
       running = true;
       if (stopwatch.elapsedMilliseconds >= (qLength - 1) * 1000 * 60) {
         timer = new Timer.periodic(new Duration(milliseconds: 100), callback);
@@ -692,7 +682,9 @@ class TimerTextState extends State<TimerText> {
     final TextStyle timerTextStyle = const TextStyle(
         fontSize: 80.0, fontFamily: "ShotClock", color: Colors.red);
     text = TimerTextFormatter.format(
-        (periodLength * 1000 * 60) - stopwatch.elapsedMilliseconds,
+        (stopwatch.elapsedMilliseconds >= (qLength) * 1000 * 60)
+            ? 0
+            : (periodLength * 1000 * 60) - stopwatch.elapsedMilliseconds,
         stopwatch.elapsedMilliseconds > (periodLength - 1) * 1000 * 60);
     return new Text(text, style: timerTextStyle);
   }
