@@ -50,3 +50,79 @@ class Scores {
     this.team2 = team2;
   }
 }
+
+
+class TeamScorePeriod extends StatefulWidget {
+  TeamScorePeriod({this.scores, this.darkTheme = false, this.periodNumber});
+
+  final List<Scores> scores;
+  final bool darkTheme;
+  final int periodNumber;
+
+  @override
+  createState() {
+    return new TeamScorePeriodState();
+  }
+}
+
+class TeamScorePeriodState extends State<TeamScorePeriod> {
+
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+        decoration: new BoxDecoration(
+          border: new Border.all(
+            width: 2.0,
+            color: Colors.black,
+          ),
+        ),
+        constraints: new BoxConstraints(minWidth: 80.0, maxWidth: 120.0),
+        child: new ListView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          itemBuilder: (BuildContext context, int index) {
+            return new Container(
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    new Container(
+                      constraints:
+                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
+                      child: new Text(
+                        widget.scores[index].team1.toString(),
+                        textAlign: TextAlign.center,
+                        style: new TextStyle(
+                            color: (widget.darkTheme) ? Colors.blue : Colors
+                                .black),
+                      ),
+                    ),
+                    new Container(
+                      constraints:
+                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
+                      child: new Text(
+                        (index > widget.periodNumber - 1)
+                            ? " TS${index -
+                            widget.periodNumber + 1} "
+                            : " ${index + 1} ",
+                        style: new TextStyle(color: Colors.red, fontSize: 20.0),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    new Container(
+                      constraints:
+                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
+                      child: new Text(
+                        widget.scores[index].team2.toString(),
+                        textAlign: TextAlign.center,
+                        style: new TextStyle(
+                            color: (widget.darkTheme) ? Colors.blue : Colors
+                                .black),
+                      ),
+                    ),
+                  ],
+                ));
+          },
+          itemCount: widget.scores.length,
+        ));
+  }
+}

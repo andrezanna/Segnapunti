@@ -20,6 +20,7 @@ class TimerText extends StatefulWidget {
     this.inPeriod,
     this.stateChange,
     this.type = TimerType.timer,
+    this.gameOver,
   });
 
   final int periodNumber;
@@ -28,6 +29,7 @@ class TimerText extends StatefulWidget {
   final ValueChanged<void> onTimeEnd;
   final ValueChanged<TimerState> stateChange;
   final TimerType type;
+  final bool gameOver;
 
   TimerTextState createState() {
     return new TimerTextState();
@@ -80,39 +82,39 @@ class TimerTextState extends State<TimerText> {
   }
 
   void startStop() {
-    if (widget.inPeriod > widget.periodNumber - 1)
-      qLength = (widget.periodLength / 2).ceil();
-    else
-      qLength = widget.periodLength;
-    if (widget.inPeriod > oldPeriod) {
-      stopwatch.reset();
-      oldPeriod++;
-      running = false;
-      lastMinute = false;
-      widget.stateChange(TimerState.ready);
-      setState(() {});
-    } else if (shouldEnd()) {
-      notifyEndTimer();
-    } else {
-      if (!running) {
-        stopwatch.start();
-        widget.stateChange(TimerState.running);
-        setState(() {});
-        running = true;
-        changeTimerCallback();
-      } else {
-        stopwatch.stop();
+    if (!widget.gameOver) {
+      if (widget.inPeriod > widget.periodNumber - 1)
+        qLength = (widget.periodLength / 2).ceil();
+      else
+        qLength = widget.periodLength;
+      if (widget.inPeriod > oldPeriod) {
+        stopwatch.reset();
+        oldPeriod++;
         running = false;
-        widget.stateChange(TimerState.stopped);
-        timer.cancel();
+        lastMinute = false;
+        widget.stateChange(TimerState.ready);
+        setState(() {});
+      } else if (shouldEnd()) {
+        notifyEndTimer();
+      } else {
+        if (!running) {
+          stopwatch.start();
+          widget.stateChange(TimerState.running);
+          setState(() {});
+          running = true;
+          changeTimerCallback();
+        } else {
+          stopwatch.stop();
+          running = false;
+          widget.stateChange(TimerState.stopped);
+          timer.cancel();
+        }
       }
     }
   }
 
   bool shouldEnd() {
-    if (widget.type == TimerType.timer) {
-
-    } else if (stopwatch.elapsedMilliseconds > (qLength) * 1000 * 60)
+    if (stopwatch.elapsedMilliseconds >= (qLength) * 1000 * 60)
       return true;
 
     return false;
@@ -147,6 +149,14 @@ class TimerTextState extends State<TimerText> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.gameOver) {
+      stopwatch.reset();
+      oldPeriod = 0;
+      running = false;
+      lastMinute = false;
+      widget.stateChange(TimerState.ready);
+      setState(() {});
+    }
     final TextStyle timerTextStyle = const TextStyle(
         fontSize: 80.0, fontFamily: "ShotClock", color: Colors.red);
     if (widget.type == TimerType.timer) {

@@ -45,6 +45,7 @@ class BasketState extends State<Basket> {
   final List<Scores> scores = new List();
   Scores lastPeriod = new Scores(0, 0);
   SharedPreferences prefs;
+  bool gameOver = false;
 
   int oldPeriodNumber;
   int oldPeriodLength;
@@ -55,13 +56,10 @@ class BasketState extends State<Basket> {
     oldPeriodLength = periodLength;
   }
 
+
   @override
   Widget build(BuildContext context) {
-    if (scores.isEmpty || scores.length != periodNumber) {
-      scores.clear();
-      for (int i = 0; i < periodNumber; i++)
-        scores.add(new Scores(0, 0));
-    }
+
     List<Widget> actions = <Widget>[
       new MaterialButton(
         onPressed: () {
@@ -75,11 +73,11 @@ class BasketState extends State<Basket> {
         ),
       ),
     ];
-    if (inPeriod == scores.length) {
+    if (gameOver) {
       actions.add(
         new MaterialButton(
           onPressed: () {
-            nuovaPartita();
+            newGame();
           },
           child: new Text(
             "NUOVA",
@@ -120,35 +118,42 @@ class BasketState extends State<Basket> {
 
   getSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
+    if (scores.isEmpty)
+      for (int i = 0; i < periodNumber; i++) {
+        scores.add(new Scores(0, 0));
+      }
   }
 
 
   void onTimeEnd(void a) {
-    if (scores.isEmpty)
-      for (int i = 0; i < periodNumber; i++)
-        scores.add(new Scores(0, 0));
     setState(() {
       scores[inPeriod].setScores(
           team1.value - lastPeriod.team1, team2.value - lastPeriod.team2);
       lastPeriod.setScores(team1.value, team2.value);
-      if (team1.value == team2.value && inPeriod >= periodNumber - 1) {
-        scores.add(new Scores(0, 0));
-        inPeriod++;
-      } else if (inPeriod < periodNumber) {
-        inPeriod++;
-        team1.fouls = 0;
-        team2.fouls = 0;
+      if (inPeriod >= periodNumber - 1) {
+        if (team1.value == team2.value) {
+          scores.add(new Scores(0, 0));
+        } else {
+          gameOver = true;
+        }
       }
-
+      team1.fouls = 0;
+      team2.fouls = 0;
+      inPeriod++;
     });
   }
 
   Widget _buildBasket() {
-    if (periodLength != oldPeriodLength || periodNumber != oldPeriodNumber) {
+    if (periodLength != oldPeriodLength) {
       setState(() {
         oldPeriodLength = periodLength;
         oldPeriodNumber = periodNumber;
       });
+    }
+    if (periodNumber != oldPeriodNumber) {
+      scores.clear();
+      for (int i = 0; i < periodNumber; i++)
+        scores.add(new Scores(0, 0));
     }
     return new Flex(
       direction: Axis.vertical,
@@ -168,7 +173,8 @@ class BasketState extends State<Basket> {
                     periodLength: oldPeriodLength,
                     inPeriod: inPeriod,
                     onTimeEnd: onTimeEnd,
-                    stateChange: stateChange),
+                  stateChange: stateChange,
+                  gameOver: gameOver,),
 
             ),
           ),
@@ -180,7 +186,9 @@ class BasketState extends State<Basket> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               new Expanded(child: new BasketTeamScore(team1)),
-              new TeamScorePeriod(scores),
+              new TeamScorePeriod(scores: scores,
+                darkTheme: darkTheme,
+                periodNumber: periodNumber,),
               new Expanded(child: new BasketTeamScore(team2)),
             ],
           ),
@@ -190,16 +198,17 @@ class BasketState extends State<Basket> {
   }
 
 
-  void nuovaPartita() {
+  void newGame() {
     setState(() {
       lastPeriod.setScores(0, 0);
-      for (var score in scores) {
-        score.setScores(0, 0);
-      }
+      scores.clear();
+      for (int i = 0; i < periodNumber; i++)
+        scores.add(new Scores(0, 0));
       team1.value = 0;
       team2.value = 0;
       team1.fouls = 0;
       team2.fouls = 0;
+      gameOver = false;
       inPeriod = 0;
     });
   }
@@ -337,75 +346,6 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
   }
 }
 
-class TeamScorePeriod extends StatefulWidget {
-  TeamScorePeriod(this.scores);
-  final List<Scores> scores;
-  @override
-  createState() {
-    return new TeamScorePeriodState(scores);
-  }
-}
-
-class TeamScorePeriodState extends State<TeamScorePeriod> {
-  TeamScorePeriodState(this.scores);
-  final List<Scores> scores;
-  @override
-  Widget build(BuildContext context) {
-    return new Container(
-        decoration: new BoxDecoration(
-          border: new Border.all(
-            width: 2.0,
-            color: Colors.black,
-          ),
-        ),
-        constraints: new BoxConstraints(minWidth: 80.0, maxWidth: 120.0),
-        child: new ListView.builder(
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          itemBuilder: (BuildContext context, int index) {
-            return new Container(
-                child: new Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    new Container(
-                      constraints:
-                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
-                      child: new Text(
-                        scores[index].team1.toString(),
-                        textAlign: TextAlign.center,
-                        style: new TextStyle(
-                            color: (darkTheme) ? Colors.blue : Colors.black),
-                      ),
-                    ),
-                    new Container(
-                      constraints:
-                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
-                      child: new Text(
-                        (index > periodNumber - 1)
-                            ? " TS${index -
-                            periodNumber - 1} "
-                            : " ${index + 1} ",
-                        style: new TextStyle(color: Colors.red, fontSize: 20.0),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    new Container(
-                      constraints:
-                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
-                      child: new Text(
-                        scores[index].team2.toString(),
-                        textAlign: TextAlign.center,
-                        style: new TextStyle(
-                            color: (darkTheme) ? Colors.blue : Colors.black),
-                      ),
-                    ),
-                  ],
-                ));
-          },
-          itemCount: scores.length,
-        ));
-  }
-}
 
 class BasketSettings extends StatelessWidget {
   final TextEditingController _periodLength = new TextEditingController();

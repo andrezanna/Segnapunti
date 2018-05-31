@@ -42,6 +42,7 @@ class RugbyState extends State<Rugby> {
   SharedPreferences prefs;
   int oldPeriodLength;
   int oldPeriodNumber;
+  bool gameOver = false;
 
   @override
   void initState() {
@@ -53,11 +54,7 @@ class RugbyState extends State<Rugby> {
 
   @override
   Widget build(BuildContext context) {
-    if (scores.isEmpty || scores.length != periodNumber) {
-      scores.clear();
-      for (int i = 0; i < periodNumber; i++)
-        scores.add(new Scores(0, 0));
-    }
+
     List<Widget> actions = <Widget>[
       new MaterialButton(
         onPressed: () {
@@ -71,11 +68,11 @@ class RugbyState extends State<Rugby> {
         ),
       ),
     ];
-    if (inPeriod == scores.length) {
+    if (gameOver) {
       actions.add(
         new MaterialButton(
           onPressed: () {
-            nuovaPartita();
+            newGame();
           },
           child: new Text(
             "NUOVA",
@@ -107,6 +104,11 @@ class RugbyState extends State<Rugby> {
 
   void getSharedPreferences() async {
     prefs = await SharedPreferences.getInstance();
+    if (scores.isEmpty) {
+      scores.clear();
+      for (int i = 0; i < periodNumber; i++)
+        scores.add(new Scores(0, 0));
+    }
   }
 
   @override
@@ -122,15 +124,22 @@ class RugbyState extends State<Rugby> {
           team1.value - lastPeriod.team1, team2.value - lastPeriod.team2);
       lastPeriod.setScores(team1.value, team2.value);
       inPeriod++;
+      if (inPeriod == periodNumber - 1)
+        gameOver = true;
     });
   }
 
   Widget _buildRugby() {
-    if (oldPeriodLength != periodLength || oldPeriodNumber != periodNumber) {
+    if (oldPeriodLength != periodLength) {
       setState(() {
         oldPeriodNumber = periodNumber;
         oldPeriodLength = periodLength;
       });
+    }
+    if (oldPeriodNumber != periodNumber) {
+      scores.clear();
+      for (int i = 0; i < periodNumber; i++)
+        scores.add(new Scores(0, 0));
     }
     return new Flex(
       direction: Axis.vertical,
@@ -149,7 +158,9 @@ class RugbyState extends State<Rugby> {
               inPeriod: inPeriod,
               type: TimerType.chronometer,
               onTimeEnd: onTimeEnd,
-              stateChange: stateChange,),
+              stateChange: stateChange,
+              gameOver: gameOver,
+            ),
 
           ),
         ),
@@ -160,7 +171,9 @@ class RugbyState extends State<Rugby> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               new Expanded(child: new RugbyTeamScore(team1)),
-              new TeamScorePeriod(scores),
+              new TeamScorePeriod(scores: scores,
+                darkTheme: darkTheme,
+                periodNumber: periodNumber,),
               new Expanded(child: new RugbyTeamScore(team2)),
             ],
           ),
@@ -170,8 +183,7 @@ class RugbyState extends State<Rugby> {
   }
 
 
-
-  void nuovaPartita() {
+  void newGame() {
     setState(() {
       lastPeriod.setScores(0, 0);
       for (var score in scores) {
@@ -179,7 +191,7 @@ class RugbyState extends State<Rugby> {
       }
       team1.value = 0;
       team2.value = 0;
-
+      gameOver = false;
       inPeriod = 0;
     });
   }
@@ -285,76 +297,6 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
   }
 }
 
-class TeamScorePeriod extends StatefulWidget {
-  TeamScorePeriod(this.scores);
-
-  final List<Scores> scores;
-
-  @override
-  createState() {
-    return new TeamScorePeriodState(scores);
-  }
-}
-
-class TeamScorePeriodState extends State<TeamScorePeriod> {
-  TeamScorePeriodState(this.scores);
-
-  final List<Scores> scores;
-
-  @override
-  Widget build(BuildContext context) {
-    return new Container(
-        decoration: new BoxDecoration(
-          border: new Border.all(
-            width: 2.0,
-            color: Colors.black,
-          ),
-        ),
-        constraints: new BoxConstraints(minWidth: 80.0, maxWidth: 120.0),
-        child: new ListView.builder(
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          itemBuilder: (BuildContext context, int index) {
-            return new Container(
-                child: new Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    new Container(
-                      constraints:
-                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
-                      child: new Text(
-                        scores[index].team1.toString(),
-                        textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 20.0,
-                            color: (darkTheme) ? Colors.blue : Colors.black),
-                      ),
-                    ),
-                    new Container(
-                      constraints:
-                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
-                      child: new Text(
-                        " ${index + 1} ",
-                        style: new TextStyle(color: Colors.red, fontSize: 20.0),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    new Container(
-                      constraints:
-                      new BoxConstraints(minWidth: 28.0, maxWidth: 40.0),
-                      child: new Text(
-                        scores[index].team2.toString(),
-                        textAlign: TextAlign.center,
-                        style: new TextStyle(fontSize: 20.0,
-                            color: (darkTheme) ? Colors.blue : Colors.black),
-                      ),
-                    ),
-                  ],
-                ));
-          },
-          itemCount: scores.length,
-        ));
-  }
-}
 
 class RugbySettings extends StatelessWidget {
   final TextEditingController _periodLength = new TextEditingController();
