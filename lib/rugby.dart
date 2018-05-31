@@ -124,7 +124,7 @@ class RugbyState extends State<Rugby> {
           team1.value - lastPeriod.team1, team2.value - lastPeriod.team2);
       lastPeriod.setScores(team1.value, team2.value);
       inPeriod++;
-      if (inPeriod == periodNumber - 1)
+      if (inPeriod == periodNumber)
         gameOver = true;
     });
   }
@@ -186,9 +186,9 @@ class RugbyState extends State<Rugby> {
   void newGame() {
     setState(() {
       lastPeriod.setScores(0, 0);
-      for (var score in scores) {
-        score.setScores(0, 0);
-      }
+      scores.clear();
+      for (int i = 0; i < periodNumber; i++)
+        scores.add(new Scores(0, 0));
       team1.value = 0;
       team2.value = 0;
       gameOver = false;
