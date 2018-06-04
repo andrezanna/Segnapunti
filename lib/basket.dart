@@ -57,6 +57,7 @@ class BasketState extends State<Basket> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
 
@@ -140,6 +141,7 @@ class BasketState extends State<Basket> {
       team1.fouls = 0;
       team2.fouls = 0;
       inPeriod++;
+
     });
   }
 
