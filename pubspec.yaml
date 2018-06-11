@@ -22,16 +22,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
-
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #  - images/a_dot_burr.jpeg
-  #  - images/a_dot_ham.jpeg
   assets:
     - images/emptyBall.png
     - images/p1.png
@@ -54,48 +45,6 @@ flutter:
     - images/tennis.png
     - images/rugby.png
     - images/numbers.png
-    - images/2.0x/emptyBall.png
-    - images/2.0x/p1.png
-    - images/2.0x/p2.png
-    - images/2.0x/p3.png
-    - images/2.0x/p4.png
-    - images/2.0x/p5.png
-    - images/2.0x/p6.png
-    - images/2.0x/p7.png
-    - images/2.0x/p8.png
-    - images/2.0x/p9.png
-    - images/2.0x/p10.png
-    - images/2.0x/p11.png
-    - images/2.0x/p12.png
-    - images/2.0x/p13.png
-    - images/2.0x/p14.png
-    - images/2.0x/p15.png
-    - images/2.0x/basket.png
-    - images/2.0x/volley.png
-    - images/2.0x/tennis.png
-    - images/2.0x/rugby.png
-    - images/2.0x/numbers.png
-    - images/3.0x/emptyBall.png
-    - images/3.0x/p1.png
-    - images/3.0x/p2.png
-    - images/3.0x/p3.png
-    - images/3.0x/p4.png
-    - images/3.0x/p5.png
-    - images/3.0x/p6.png
-    - images/3.0x/p7.png
-    - images/3.0x/p8.png
-    - images/3.0x/p9.png
-    - images/3.0x/p10.png
-    - images/3.0x/p11.png
-    - images/3.0x/p12.png
-    - images/3.0x/p13.png
-    - images/3.0x/p14.png
-    - images/3.0x/p15.png
-    - images/3.0x/basket.png
-    - images/3.0x/volley.png
-    - images/3.0x/tennis.png
-    - images/3.0x/rugby.png
-    - images/3.0x/numbers.png
     - icon/apple.png
   fonts:
     - family: ShotClock

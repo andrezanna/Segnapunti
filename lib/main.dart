@@ -85,21 +85,24 @@ class ParentState extends State<Parent> {
               ? Color.fromARGB(255, 50, 50, 50)
               : Color.fromARGB(255, 250, 250, 250),
           bottomNavigationBar:
-          new Flex(direction: Axis.horizontal, children: <Widget>[
-            (Platform.isAndroid)
-                ? new Expanded(
-                child: new Icon(
-                  Icons.android,
-                  size: 32.0,
-                ))
-                : new Expanded(
-                child: new Image.asset(
-                  "icon/apple.png",
-                  width: 32.0,
-                  height: 32.0,
-                )),
-            new Expanded(child: new Text(_systemVersion))
-          ]),
+          new Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: new Flex(direction: Axis.horizontal, children: <Widget>[
+              (Platform.isAndroid)
+                  ? new Expanded(
+                  child: new Icon(
+                    Icons.android,
+                    size: 32.0,
+                  ))
+                  : new Expanded(
+                  child: new Image.asset(
+                    "icon/apple.png",
+                    width: 32.0,
+                    height: 32.0,
+                  )),
+              new Expanded(child: new Text(_systemVersion))
+            ]),
+          ),
         ));
   }
 

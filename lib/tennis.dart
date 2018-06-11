@@ -569,13 +569,18 @@ class TennisSettingsState extends State<TennisSettings> {
             trailing: new Text("Tie Break",
                 style: new TextStyle(
                     color: (darkTheme) ? Colors.blue : Colors.black)),
-            title: new Switch(
-              value: tieBreak,
-              onChanged: (value) {
-                setState(() {
-                  tieBreak = value;
-                });
-              },
+            title: new Align(
+              alignment: Alignment.centerLeft,
+              child: new Switch(
+                value: tieBreak,
+                onChanged: (value) {
+                  setState(() {
+                    tieBreak = value;
+                  });
+                },
+
+
+              ),
             )),
         new ListTile(
             trailing: new Text("Al Meglio di (# set)",
