@@ -1,4 +1,3 @@
-import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -105,7 +104,7 @@ class VolleyState extends State<Volley> {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.all(36.0),
-          child: new VolleyScorePeriod(scores, player1, player2),
+          child: new HorizontalScorePeriod(scores, player1, player2, darkTheme),
         ),
         new Expanded(
           child: new Row(
@@ -206,15 +205,11 @@ class VolleyScore extends StatefulWidget {
   final VolleyPlayer team;
 
   @override
-  createState() => new VolleyScoreState(team, pointScored);
+  createState() => new VolleyScoreState();
 }
 
 class VolleyScoreState extends State<VolleyScore> {
-  VolleyScoreState(this.team, this.pointScored);
 
-  final ValueChanged<VolleyPlayer> pointScored;
-
-  final VolleyPlayer team;
   final TextEditingController _controller = new TextEditingController();
   FocusNode focusNode = new FocusNode();
 
@@ -230,14 +225,14 @@ class VolleyScoreState extends State<VolleyScore> {
           child: new MaterialButton(
             onPressed: () {
               setState(() {
-                if (team.value > 0 && !matchWon) team.value -= 1;
+                if (widget.team.value > 0 && !matchWon) widget.team.value -= 1;
               });
             },
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Text(
-                  team.value.toString(),
+                  widget.team.value.toString(),
                   style: new TextStyle(
                     color: Colors.red,
                     fontSize: 40.0,
@@ -245,7 +240,7 @@ class VolleyScoreState extends State<VolleyScore> {
                   textAlign: TextAlign.right,
                 ),
                 new Icon(
-                  (team.service) ? Icons.brightness_1 : null,
+                  (widget.team.service) ? Icons.brightness_1 : null,
                   color: Colors.red,
                   size: 10.0,
                 ),
@@ -260,7 +255,7 @@ class VolleyScoreState extends State<VolleyScore> {
               focusNode: focusNode,
               textAlign: TextAlign.center,
               decoration: new InputDecoration(
-                hintText: team.name,
+                hintText: widget.team.name,
                 hintStyle: new TextStyle(
                     color: (darkTheme) ? Colors.blue : Colors.black),
 
@@ -275,9 +270,9 @@ class VolleyScoreState extends State<VolleyScore> {
           child: new MaterialButton(
               onPressed: () {
                 setState(() {
-                  if (!matchWon) team.value += 1;
+                  if (!matchWon) widget.team.value += 1;
                 });
-                pointScored(team);
+                widget.pointScored(widget.team);
               },
               child: new Text(
                 "Punto",
@@ -298,114 +293,13 @@ class VolleyScoreState extends State<VolleyScore> {
   void nameChange() {
     if (_controller.text.isNotEmpty) {
       if (_controller.text.length <= 20) {
-        team.setName(_controller.text);
+        widget.team.setName(_controller.text);
       } else {
-        _controller.text = team.name;
+        _controller.text = widget.team.name;
       }
     } else {
-      team.setName("Giocatore ${team.index}");
+      widget.team.setName("Giocatore ${widget.team.index}");
     }
-  }
-}
-
-class VolleyScorePeriod extends StatefulWidget {
-  final VolleyPlayer team1;
-  final VolleyPlayer team2;
-
-  VolleyScorePeriod(this.scores, this.team1, this.team2);
-
-  final List<Scores> scores;
-
-  @override
-  createState() {
-    return new VolleyScorePeriodState(scores, team1, team2);
-  }
-}
-
-class VolleyScorePeriodState extends State<VolleyScorePeriod> {
-  VolleyScorePeriodState(this.scores, this.team1, this.team2);
-
-  final VolleyPlayer team1;
-  final VolleyPlayer team2;
-  final List<Scores> scores;
-
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> scoresTeam1 = <Widget>[];
-    for (int i = 0; i < scores.length; i++)
-      scoresTeam1.add(new Expanded(
-        child: new Text(
-          scores[i].team1.toString(),
-          textAlign: TextAlign.center,
-          style: new TextStyle(
-              fontSize: 20.0,
-              color: (darkTheme) ? Colors.blue : Colors.black),
-        ),
-      ));
-    List<Widget> scoresTeam2 = <Widget>[];
-    for (int i = 0; i < scores.length; i++)
-      scoresTeam2.add(new Expanded(
-        child: new Text(
-          scores[i].team2.toString(),
-          textAlign: TextAlign.center,
-          style: new TextStyle(
-              fontSize: 20.0,
-              color: (darkTheme) ? Colors.blue : Colors.black),
-        ),
-      ));
-    return new Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        new Flex(
-          direction: Axis.horizontal,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            new Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: new Text(
-                team1.name,
-                textAlign: TextAlign.center,
-                style: new TextStyle(
-                    fontSize: 20.0,
-                    color: (darkTheme) ? Colors.blue : Colors.black),
-              ),
-            ),
-            new Expanded(
-                child: new Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: new Flex(
-                    children: scoresTeam1,
-                    direction: Axis.horizontal,
-                  ),
-                )),
-          ],
-        ),
-        new Flex(
-          direction: Axis.horizontal,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            new Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: new Text(
-                team2.name,
-                textAlign: TextAlign.center,
-                style: new TextStyle(
-                    fontSize: 20.0,
-                    color: (darkTheme) ? Colors.blue : Colors.black),
-              ),
-            ),
-            new Expanded(
-                child: new Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: new Flex(
-                    children: scoresTeam2,
-                    direction: Axis.horizontal,
-                  ),
-                )),
-          ],
-        ),
-      ],
-    );
   }
 }
 

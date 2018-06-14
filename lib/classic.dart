@@ -1,14 +1,29 @@
-import 'package:Segnapunti/player.dart';
-import 'package:Segnapunti/util.dart' as Util;
+import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/**
+ * Gestione del segnapunti classico
+ * @param darkTheme valore preso dalle preferenze
+ * @param play lista dei giocanti, con relativi nomi e punteggi
+ */
 bool darkTheme = false;
 final List<ClassicPlayer> play = <ClassicPlayer>[
-  new ClassicPlayer("Giocatore 1", minValue),
-  new ClassicPlayer("Giocatore 2", minValue),
+  new ClassicPlayer("Giocatore 1", stValue),
+  new ClassicPlayer("Giocatore 2", stValue),
 ];
+
+/**
+ * @param minValue valore minimo del segnapunti
+ * @param maxValue massimo del segnapunti
+ * @param stValue valore di partenza del gioco
+ */
+int minValue = 0;
+int maxValue = 60;
+int stValue = 0;
+//usata per lo scroll per la modifica dei nomi
+final ScrollController scrollController = new ScrollController();
 
 class Classic extends StatefulWidget {
   @override
@@ -33,13 +48,14 @@ class Classic extends StatefulWidget {
 
 
 
-int minValue = 0;
-int maxValue = 60;
-final ScrollController scrollController = new ScrollController();
-
 class ClassicState extends State<Classic> {
   ClassicState();
 
+  /**
+   * @param _players numero di giocatori
+   * @param _playerName numero progressivo per non dare nomi uguali ai giocatori
+   *                    anche a seguito di cancellazione
+   */
   int _players = 2;
   int _playerName = 2;
 
@@ -110,31 +126,26 @@ class ClassicState extends State<Classic> {
 }
 
 class BuildRow extends StatefulWidget {
-  BuildRow(this.index, this._removePlayer, this._onChanged);
+  BuildRow(this.index, this.removePlayer, this.onChanged);
 
-  final ValueChanged<int> _removePlayer;
+  final ValueChanged<int> removePlayer;
 
-  final ValueChanged<void> _onChanged;
+  final ValueChanged<void> onChanged;
   final int index;
 
   @override
   createState() =>
-      new BuildRowState(
-          index: index, removePlayer: _removePlayer, onChanged: _onChanged);
+      new BuildRowState();
 }
 
 class BuildRowState extends State<BuildRow> {
-  BuildRowState({this.index, this.removePlayer, this.onChanged});
 
 //parte importante, value changer sono dei riferimenti che ho
   //quando cambio il valore chiamo le funzioni referenziate
   //servono per ricostruire il layout generale.
 
   //Approccio child state, parent state, mixed state
-  final ValueChanged<int> removePlayer;
 
-  final ValueChanged<void> onChanged;
-  final int index;
   final TextEditingController _controller = new TextEditingController();
   bool maxReached = false;
   FocusNode focusNode = new FocusNode();
@@ -142,14 +153,14 @@ class BuildRowState extends State<BuildRow> {
   Widget _buildRow(int index) {
     _controller.addListener(nameChange);
     focusNode.addListener(_ensureVisible);
-    NumberPicker p = buildPickerInteger(index);
-    play[index].setNumberPicker(p);
+    NumberPicker numberPicker = buildPickerInteger(index);
+    play[index].setNumberPicker(numberPicker);
     return new Dismissible(
         key: new ObjectKey(play[index]),
         direction: DismissDirection.endToStart,
         onDismissed: (DismissDirection direction) {
           setState(() {
-            removePlayer(index);
+            widget.removePlayer(index);
           });
         },
         background:
@@ -168,12 +179,12 @@ class BuildRowState extends State<BuildRow> {
               ),
             ),
           ),
-          trailing: p,
+          trailing: numberPicker,
         ));
   }
 
   void _ensureVisible() {
-    Util.ensureVisible(context, focusNode);
+    ensureVisible(context, focusNode);
   }
 
   Widget buildPickerInteger(int index) {
@@ -184,7 +195,7 @@ class BuildRowState extends State<BuildRow> {
       initialValue:
       (play[index].value >= minValue && play[index].value <= maxValue)
           ? play[index].value
-          : play[index].value = minValue,
+          : play[index].value = stValue,
       listViewWidth: 150.0,
       listViewHeight: 50.0,
       itemExtent: 50.0,
@@ -198,7 +209,7 @@ class BuildRowState extends State<BuildRow> {
                 new AlertDialog(
                   title: new Text("Vincitore!!"),
                   content: new Text("${play[index]
-      .name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
+                      .name}, ha vinto!!.\nVuoi iniziare una nuova partita?"),
                   actions: <Widget>[
                     new MaterialButton(
                       onPressed: () {
@@ -238,41 +249,43 @@ class BuildRowState extends State<BuildRow> {
       pl.setValue(minValue);
       pl.np.animateIntfor(minValue, 10000);
     }
-    onChanged(null);
+    widget.onChanged(null);
   }
 
   void nameChange() {
-    scrollController.animateTo(50.0 * index,
+    scrollController.animateTo(50.0 * widget.index,
         duration: new Duration(milliseconds: 1000), curve: Curves.easeOut);
 
     if (_controller.text.isNotEmpty) {
-      play[index].setName(_controller.text);
+      play[widget.index].setName(_controller.text);
     } else {
-      play[index].setName("Giocatore ${index + 1}");
+      play[widget.index].setName("Giocatore ${widget.index + 1}");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildRow(index);
+    return _buildRow(widget.index);
   }
 }
 
 class ClassicSettings extends AlertDialog {
-  final TextEditingController _mincontroller = new TextEditingController();
-  final TextEditingController _maxcontroller = new TextEditingController();
+  final TextEditingController _minController = new TextEditingController();
+  final TextEditingController _maxController = new TextEditingController();
+  final TextEditingController _startController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     bool shown = false;
-    _mincontroller.addListener(() {
-      int newValue = int.parse(_mincontroller.text.toString());
-      if (newValue <= maxValue)
+    _minController.addListener(() {
+      int newValue = int.parse(_minController.text.toString());
+      if (newValue < maxValue)
         minValue = newValue;
       else if (!(shown)) {
         shown = true;
         showDialog(
             context: context,
+            barrierDismissible: false,
             builder: (context) =>
             new AlertDialog(
               title: new Text("Valore non valido",),
@@ -290,19 +303,46 @@ class ClassicSettings extends AlertDialog {
             ));
       }
     });
-    _maxcontroller.addListener(() {
-      int newValue = int.parse(_maxcontroller.text.toString());
-      if (newValue >= minValue)
-        minValue = newValue;
+    _maxController.addListener(() {
+      int newValue = int.parse(_maxController.text.toString());
+      if (newValue > minValue)
+        maxValue = newValue;
       else if (!(shown)) {
         shown = true;
         showDialog(
             context: context,
+            barrierDismissible: false,
             builder: (context) =>
             new AlertDialog(
               title: new Text("Valore non valido"),
               content: new Text(
-                  "Il valore massimo non può essere minore del minimo"),
+                  "Il valore massimo deve essere maggiore del minimo"),
+              actions: <Widget>[
+                new MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    shown = false;
+                  },
+                  child: new Icon(Icons.close),
+                )
+              ],
+            ));
+      }
+    });
+    _startController.addListener(() {
+      int newValue = int.parse(_startController.text.toString());
+      if (newValue < maxValue && newValue >= minValue)
+        stValue = newValue;
+      else if (!(shown)) {
+        shown = true;
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) =>
+            new AlertDialog(
+              title: new Text("Valore non valido",),
+              content: new Text(
+                  "Il valore di partenza deve essere compreso tra il minimo e il massimo"),
               actions: <Widget>[
                 new MaterialButton(
                   onPressed: () {
@@ -338,7 +378,7 @@ class ClassicSettings extends AlertDialog {
               ),
               style: new TextStyle(
                   color: darkTheme ? Colors.blue : Colors.black),
-              controller: _mincontroller,
+              controller: _minController,
             ),
             trailing: new Text("Valore minimo", style: new TextStyle(
                 color: darkTheme ? Colors.blue : Colors.black),),
@@ -354,7 +394,21 @@ class ClassicSettings extends AlertDialog {
                 hintStyle: new TextStyle(
                     color: darkTheme ? Colors.blue : Colors.black),
               ),
-              controller: _maxcontroller,
+              controller: _maxController,
+              style: new TextStyle(
+                  color: darkTheme ? Colors.blue : Colors.black),
+            )),
+        new ListTile(
+            trailing: new Text("Valore di partenza", style: new TextStyle(
+                color: darkTheme ? Colors.blue : Colors.black),),
+            title: new TextField(
+              keyboardType: TextInputType.number,
+              decoration: new InputDecoration(
+                hintText: stValue.toString(),
+                hintStyle: new TextStyle(
+                    color: darkTheme ? Colors.blue : Colors.black),
+              ),
+              controller: _startController,
               style: new TextStyle(
                   color: darkTheme ? Colors.blue : Colors.black),
             )),

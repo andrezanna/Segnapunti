@@ -29,12 +29,13 @@ class Parent extends StatefulWidget {
 class ParentState extends State<Parent> {
   static const platform =
   const MethodChannel('andrea.zanini.segnapunti/system_version');
-
-  ParentState() {
-    _getSystemVersion();
-  }
-
   String _systemVersion = 'Sistema sconosciuto';
+
+  @override
+  void initState() {
+    _getSystemVersion();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

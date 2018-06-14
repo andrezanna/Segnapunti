@@ -1,5 +1,4 @@
 
-import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/timertextformatter.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
@@ -171,7 +170,7 @@ class RugbyState extends State<Rugby> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               new Expanded(child: new RugbyTeamScore(team1)),
-              new TeamScorePeriod(scores: scores,
+              new VerticalScorePeriod(scores: scores,
                 darkTheme: darkTheme,
                 periodNumber: periodNumber,),
               new Expanded(child: new RugbyTeamScore(team2)),
@@ -207,14 +206,10 @@ class RugbyTeamScore extends StatefulWidget {
   final Player team;
 
   @override
-  createState() => new RugbyTeamScoreState(team);
+  createState() => new RugbyTeamScoreState();
 }
 
 class RugbyTeamScoreState extends State<RugbyTeamScore> {
-  RugbyTeamScoreState(this.team);
-
-  final Player team;
-
   @override
   Widget build(BuildContext context) {
     return new Column(
@@ -223,14 +218,14 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
           child: new MaterialButton(
             onPressed: () {
               setState(() {
-                if (team.value > 0) team.value -= 1;
+                if (widget.team.value > 0) widget.team.value -= 1;
               });
             },
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Text(
-                  team.value.toString(),
+                  widget.team.value.toString(),
                   style: new TextStyle(
                     color: Colors.red,
                     fontSize: 40.0,
@@ -244,7 +239,7 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
         new Expanded(
           child: new FittedBox(
             child: new Text(
-              team.name,
+              widget.team.name,
               style: new TextStyle(fontSize: 30.0,
                   fontWeight: FontWeight.bold,
                   color: (darkTheme) ? Colors.blue : Colors.black),
@@ -256,7 +251,7 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
               onPressed: () {
                 if (timerState != TimerState.ready)
                   setState(() {
-                    team.value += 5;
+                    widget.team.value += 5;
                   });
               },
               child: new Text(
@@ -270,7 +265,7 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
               onPressed: () {
                 if (timerState == TimerState.running)
                   setState(() {
-                    team.value += 2;
+                    widget.team.value += 2;
                   });
               },
               child: new Text(
@@ -284,7 +279,7 @@ class RugbyTeamScoreState extends State<RugbyTeamScore> {
                 onPressed: () {
                   if (timerState == TimerState.running)
                     setState(() {
-                      team.value += 3;
+                      widget.team.value += 3;
                     });
                 },
                 child: new Text(

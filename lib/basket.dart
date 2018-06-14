@@ -1,5 +1,4 @@
 
-import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/timertextformatter.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +11,6 @@ int shotClock = 24;
 int inPeriod = 0;
 bool darkTheme = false;
 TimerState timerState;
-
-//TODO - TimeEnd
-
 
 class Basket extends StatefulWidget {
   @override
@@ -188,7 +184,7 @@ class BasketState extends State<Basket> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               new Expanded(child: new BasketTeamScore(team1)),
-              new TeamScorePeriod(scores: scores,
+              new VerticalScorePeriod(scores: scores,
                 darkTheme: darkTheme,
                 periodNumber: periodNumber,),
               new Expanded(child: new BasketTeamScore(team2)),
@@ -225,13 +221,11 @@ class BasketTeamScore extends StatefulWidget {
 
   final BasketTeam team;
   @override
-  createState() => new BasketTeamScoreState(team);
+  createState() => new BasketTeamScoreState();
 }
 
 class BasketTeamScoreState extends State<BasketTeamScore> {
-  BasketTeamScoreState(this.team);
 
-  final BasketTeam team;
   @override
   Widget build(BuildContext context) {
     return new Column(
@@ -239,7 +233,7 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
         new MaterialButton(
           onPressed: () {
             setState(() {
-              if (team.value > 0) team.value -= 1;
+              if (widget.team.value > 0) widget.team.value -= 1;
             });
           },
           child: new Flex(
@@ -249,7 +243,7 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                 child: new Container(
                   child: new FittedBox(
                     child: new Text(
-                      team.value.toString().padLeft(3, '0'),
+                      widget.team.value.toString().padLeft(3, '0'),
                       style: new TextStyle(
                         color: Colors.red,
                         fontFamily: "ShotClock",
@@ -260,7 +254,9 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
 
               ),
               new Icon(
-                (team.fouls >= teamFoulThreshold) ? Icons.brightness_1 : null,
+                (widget.team.fouls >= teamFoulThreshold)
+                    ? Icons.brightness_1
+                    : null,
                 color: Colors.red,
               ),
             ],
@@ -269,7 +265,7 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
         new Expanded(
           child: new FittedBox(
             child: new Text(
-              team.name,
+              widget.team.name,
               style: new TextStyle(
                 color: (darkTheme) ? Colors.blue : Colors.black,
                 fontWeight: FontWeight.bold,
@@ -283,7 +279,7 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
               onPressed: () {
                 if (timerState != TimerState.ready)
                   setState(() {
-                    team.value += 1;
+                    widget.team.value += 1;
                   });
               },
               child: new Text(
@@ -300,7 +296,7 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
               onPressed: () {
                 if (timerState == TimerState.running)
                   setState(() {
-                    team.value += 2;
+                    widget.team.value += 2;
                   });
               },
               child: new Text(
@@ -317,7 +313,7 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
                 onPressed: () {
                   if (timerState == TimerState.running)
                     setState(() {
-                      team.value += 3;
+                      widget.team.value += 3;
                     });
                 },
                 child: new Text(
@@ -332,7 +328,7 @@ class BasketTeamScoreState extends State<BasketTeamScore> {
             child: new MaterialButton(
               onPressed: () {
                 setState(() {
-                  team.fouls += 1;
+                  widget.team.fouls += 1;
                 });
               },
               child: new Text(

@@ -1,6 +1,5 @@
 import 'dart:math' as Math;
 
-import 'package:Segnapunti/player.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -149,14 +148,12 @@ class BiliardoState extends State<Biliardo> {
 
   @override
   void dispose() {
-    print("dispose");
     List<String> pl = new List();
     for (Player p in players) {
       pl.add(p.name);
       print(p.name);
     }
     prefs.setStringList("BiliardoPlayers", pl);
-    print("pref set");
     super.dispose();
   }
 
@@ -371,33 +368,23 @@ class BiliardoState extends State<Biliardo> {
 }
 
 class BuildPlayer extends StatefulWidget {
-  BuildPlayer(this.index, this._removePlayer, this._onChanged);
+  BuildPlayer(this.index, this.removePlayer, this.onChanged);
 
-  final ValueChanged<int> _removePlayer;
+  final ValueChanged<int> removePlayer;
 
-  final ValueChanged<void> _onChanged;
+  final ValueChanged<void> onChanged;
   final int index;
 
   @override
   createState() =>
-      new BuildPlayerState(
-          index: index, removePlayer: _removePlayer, onChanged: _onChanged);
+      new BuildPlayerState();
 }
 
 class BuildPlayerState extends State<BuildPlayer> {
-  //parte importante, value changer sono dei riferimenti che ho
-  //quando cambio il valore chiamo le funzioni referenziate
-  //servono per ricostruire il layout generale.
 
-  //Approccio child state, parent state, mixed state
-  final ValueChanged<int> removePlayer;
-  final int index;
-
-  final ValueChanged<void> onChanged;
   final TextEditingController _controller = new TextEditingController();
   FocusNode focusNode = new FocusNode();
 
-  BuildPlayerState({this.index, this.removePlayer, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -409,10 +396,10 @@ class BuildPlayerState extends State<BuildPlayer> {
         .width;
     return new Dismissible(
       direction: DismissDirection.down,
-      key: new ObjectKey(players[index]),
+      key: new ObjectKey(players[widget.index]),
       onDismissed: (DismissDirection direction) {
         setState(() {
-          removePlayer(index);
+          widget.removePlayer(widget.index);
         });
       },
       child: new DragTarget<BallMove>(onAccept: (BallMove data) {
@@ -436,7 +423,7 @@ class BuildPlayerState extends State<BuildPlayer> {
               new Expanded(
                   child: new Center(
                     child: new Text(
-                      players[index].value.toString(),
+                      players[widget.index].value.toString(),
                       style: new TextStyle(
                           color: darkTheme ? Colors.blue : Colors.black),
                     ),
@@ -446,7 +433,7 @@ class BuildPlayerState extends State<BuildPlayer> {
                 textAlign: TextAlign.center,
                 focusNode: focusNode,
                 decoration: new InputDecoration(
-                  hintText: players[index].name,
+                  hintText: players[widget.index].name,
                   hintStyle: new TextStyle(
                       color: darkTheme ? Colors.blue : Colors.black),
                 ),
@@ -462,10 +449,10 @@ class BuildPlayerState extends State<BuildPlayer> {
 
   void addValue(int value) {
     setState(() {
-      players[index].value += value;
+      players[widget.index].value += value;
       ballState[value - 1] = false;
-      moves.add(new Moves(value, index));
-      onChanged(null);
+      moves.add(new Moves(value, widget.index));
+      widget.onChanged(null);
     });
   }
 
@@ -476,13 +463,13 @@ class BuildPlayerState extends State<BuildPlayer> {
   void nameChange() {
     if (_controller.text.length <= 30) {
       if (_controller.text.isNotEmpty) {
-        players[index].setName(_controller.text);
+        players[widget.index].setName(_controller.text);
       } else {
-        players[index].setName("Giocatore ${index + 1}");
+        players[widget.index].setName("Giocatore ${widget.index + 1}");
       }
     } else {
       setState(() {
-        _controller.text = players[index].name;
+        _controller.text = players[widget.index].name;
       });
     }
   }
@@ -498,19 +485,11 @@ class MovableBall extends StatefulWidget {
 
   @override
   createState() =>
-      new MovableBallState(
-        value: value,
-        image: image,
-        color: color,
-      );
+      new MovableBallState();
 }
 
 class MovableBallState extends State<MovableBall> {
-  MovableBallState({this.value, this.image, this.color});
 
-  final Color color;
-  final int value;
-  final String image;
   static final GlobalKey kBallKey = new GlobalKey();
   static const double kBallSize = 100.0;
 
@@ -523,7 +502,7 @@ class MovableBallState extends State<MovableBall> {
             .body1,
         textAlign: TextAlign.center,
         child: new Image.asset(
-          image,
+          widget.image,
           width: kBallSize,
           height: kBallSize,
         ));
@@ -535,9 +514,9 @@ class MovableBallState extends State<MovableBall> {
           width: kBallSize,
           height: kBallSize,
         ));
-    if (ballState[value - 1]) {
+    if (ballState[widget.value - 1]) {
       return new Draggable<BallMove>(
-          data: new BallMove(value, color),
+          data: new BallMove(widget.value, widget.color),
           child: ball,
           childWhenDragging: dashedBall,
           feedback: ball,
