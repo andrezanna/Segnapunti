@@ -60,7 +60,7 @@ class ClassicState extends State<Classic> {
   int _playerName = 2;
 
   void _addPlayer() {
-    play.add(new ClassicPlayer("Giocatore ${_playerName + 1}", minValue));
+    play.add(new ClassicPlayer("Giocatore ${_playerName + 1}", stValue));
     setState(() {
       _players++;
       _playerName++;
@@ -246,8 +246,8 @@ class BuildRowState extends State<BuildRow> {
   void resetGame() {
     Navigator.pop(context);
     for (var pl in play) {
-      pl.setValue(minValue);
-      pl.np.animateIntfor(minValue, 10000);
+      pl.setValue(stValue);
+      pl.np.animateIntfor(stValue, 1000);
     }
     widget.onChanged(null);
   }
