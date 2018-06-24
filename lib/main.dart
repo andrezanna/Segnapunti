@@ -56,30 +56,35 @@ class ParentState extends State<Parent> {
         },
         home: new Scaffold(
           appBar: new AppBar(
-            title: new Text("Segnapunti",
+            title: new Text(
+              "Segnapunti",
               style: new TextStyle(
-                  color: (darkTheme) ? Colors.black : Colors.white),),
+                  color: (darkTheme) ? Colors.black : Colors.white),
+            ),
             backgroundColor: Colors.blue,
             actions: <Widget>[
               new MaterialButton(
                 onPressed: () {
                   _saveValues(!darkTheme);
                 },
-                child: new Text((darkTheme) ? "White Theme" : "Dark Theme",
+                child: new Text(
+                  (darkTheme) ? "White Theme" : "Dark Theme",
                   style: new TextStyle(
                       color: (darkTheme) ? Colors.white : Colors.black),
-                ),)
+                ),
+              )
             ],
           ),
           body: new Flex(
-            children: <Widget>[new MyApp(),],
+            children: <Widget>[
+              new MyApp(),
+            ],
             direction: Axis.vertical,
           ),
           backgroundColor: (darkTheme)
               ? Color.fromARGB(255, 50, 50, 50)
               : Color.fromARGB(255, 250, 250, 250),
-          bottomNavigationBar:
-          new Padding(
+          bottomNavigationBar: new Padding(
             padding: const EdgeInsets.all(8.0),
             child: new Flex(direction: Axis.horizontal, children: <Widget>[
               (Platform.isAndroid)

@@ -69,7 +69,6 @@ class BiliardoState extends State<Biliardo> {
                 fontWeight: FontWeight.bold)),
         title: new Text('Biliardo'),
       ),
-
       bottomNavigationBar: new Theme(
         data: Theme.of(context).copyWith(
           // sets the background color of the `BottomNavigationBar`
@@ -79,7 +78,6 @@ class BiliardoState extends State<Biliardo> {
         ),
         child: new BottomNavigationBar(
           currentIndex: index,
-
           onTap: (int index) {
             switch (index) {
               case 0:
@@ -92,7 +90,6 @@ class BiliardoState extends State<Biliardo> {
                 reset();
                 break;
             }
-
 
             setState(() {
               this.index = index;
@@ -134,22 +131,14 @@ class BiliardoState extends State<Biliardo> {
                   color: Colors.blue,
                 ),
               ),
-              ),
-          ],
-
             ),
-
-
+          ],
+        ),
       ),
-      body: new ListView(
-
-          children: <Widget>[
-            buildBiliardo(),
-            buildPlayers(),
-
-
-          ]),
-
+      body: new ListView(children: <Widget>[
+        buildBiliardo(),
+        buildPlayers(),
+      ]),
       backgroundColor: (darkTheme)
           ? Color.fromARGB(255, 50, 50, 50)
           : Color.fromARGB(255, 250, 250, 250),
@@ -225,89 +214,88 @@ class BiliardoState extends State<Biliardo> {
   Widget buildBiliardo() {
     return new GridView.count(
       shrinkWrap: true,
-        crossAxisCount: 4,
-        controller: new ScrollController(
-            initialScrollOffset: 0.0, keepScrollOffset: true),
-        childAspectRatio: 1.0,
-        padding: const EdgeInsets.fromLTRB(16.0, 25.0, 16.0, 30.0),
-        children: <Widget>[
-          new MovableBall(
-            1,
-            'images/p1.png',
-            Colors.yellow,
-          ),
-          new MovableBall(
-            2,
-            'images/p2.png',
-            Colors.blue,
-          ),
-          new MovableBall(
-            3,
-            'images/p3.png',
-            Colors.red,
-          ),
-          new MovableBall(
-            4,
-            'images/p4.png',
-            Colors.purple,
-          ),
-          new MovableBall(
-            5,
-            'images/p5.png',
-            Colors.orange,
-          ),
-          new MovableBall(
-            6,
-            'images/p6.png',
-            Colors.green,
-          ),
-          new MovableBall(
-            7,
-            'images/p7.png',
-            Colors.brown,
-          ),
-          new MovableBall(
-            8,
-            'images/p8.png',
-            Colors.black,
-          ),
-          new MovableBall(
-            9,
-            'images/p9.png',
-            Colors.yellow,
-          ),
-          new MovableBall(
-            10,
-            'images/p10.png',
-            Colors.blue,
-          ),
-          new MovableBall(
-            11,
-            'images/p11.png',
-            Colors.red,
-          ),
-          new MovableBall(
-            12,
-            'images/p12.png',
-            Colors.purple,
-          ),
-          new MovableBall(
-            13,
-            'images/p13.png',
-            Colors.orange,
-          ),
-          new MovableBall(
-            14,
-            'images/p14.png',
-            Colors.green,
-          ),
-          new MovableBall(
-            15,
-            'images/p15.png',
-            Colors.brown,
-          ),
-        ],
-
+      crossAxisCount: 4,
+      controller: new ScrollController(
+          initialScrollOffset: 0.0, keepScrollOffset: true),
+      childAspectRatio: 1.0,
+      padding: const EdgeInsets.fromLTRB(16.0, 25.0, 16.0, 30.0),
+      children: <Widget>[
+        new MovableBall(
+          1,
+          'images/p1.png',
+          Colors.yellow,
+        ),
+        new MovableBall(
+          2,
+          'images/p2.png',
+          Colors.blue,
+        ),
+        new MovableBall(
+          3,
+          'images/p3.png',
+          Colors.red,
+        ),
+        new MovableBall(
+          4,
+          'images/p4.png',
+          Colors.purple,
+        ),
+        new MovableBall(
+          5,
+          'images/p5.png',
+          Colors.orange,
+        ),
+        new MovableBall(
+          6,
+          'images/p6.png',
+          Colors.green,
+        ),
+        new MovableBall(
+          7,
+          'images/p7.png',
+          Colors.brown,
+        ),
+        new MovableBall(
+          8,
+          'images/p8.png',
+          Colors.black,
+        ),
+        new MovableBall(
+          9,
+          'images/p9.png',
+          Colors.yellow,
+        ),
+        new MovableBall(
+          10,
+          'images/p10.png',
+          Colors.blue,
+        ),
+        new MovableBall(
+          11,
+          'images/p11.png',
+          Colors.red,
+        ),
+        new MovableBall(
+          12,
+          'images/p12.png',
+          Colors.purple,
+        ),
+        new MovableBall(
+          13,
+          'images/p13.png',
+          Colors.orange,
+        ),
+        new MovableBall(
+          14,
+          'images/p14.png',
+          Colors.green,
+        ),
+        new MovableBall(
+          15,
+          'images/p15.png',
+          Colors.brown,
+        ),
+      ],
     );
   }
 
@@ -355,7 +343,6 @@ class BiliardoState extends State<Biliardo> {
     } catch (e) {
       print("nessuna mossa da annullare");
     }
-
   }
 
   void reset() {
@@ -395,14 +382,11 @@ class BuildPlayer extends StatefulWidget {
   final int index;
 
   @override
-  createState() =>
-      new BuildPlayerState();
+  createState() => new BuildPlayerState();
 }
 
 class BuildPlayerState extends State<BuildPlayer> {
-
   final TextEditingController _controller = new TextEditingController();
-
 
   @override
   Widget build(BuildContext context) {
@@ -426,8 +410,11 @@ class BuildPlayerState extends State<BuildPlayer> {
         return new Container(
           width: Math.max((width - 32.0) / players.length, 110.0),
           decoration: new BoxDecoration(
-            color: accepted.isEmpty ? null : (darkTheme ? accepted.last.color
-                .withAlpha(50) : Colors.grey.shade200),
+            color: accepted.isEmpty
+                ? null
+                : (darkTheme
+                ? accepted.last.color.withAlpha(50)
+                : Colors.grey.shade200),
             border: new Border.all(
                 width: 3.0,
                 color: accepted.isEmpty
@@ -472,7 +459,6 @@ class BuildPlayerState extends State<BuildPlayer> {
     });
   }
 
-
   void nameChange() {
     if (_controller.text.length <= 30) {
       if (_controller.text.isNotEmpty) {
@@ -486,7 +472,6 @@ class BuildPlayerState extends State<BuildPlayer> {
       });
     }
   }
-
 }
 
 class MovableBall extends StatefulWidget {
@@ -497,12 +482,10 @@ class MovableBall extends StatefulWidget {
   final String image;
 
   @override
-  createState() =>
-      new MovableBallState();
+  createState() => new MovableBallState();
 }
 
 class MovableBallState extends State<MovableBall> {
-
   static final GlobalKey kBallKey = new GlobalKey();
   static const double kBallSize = 100.0;
 
