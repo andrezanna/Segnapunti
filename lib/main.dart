@@ -46,7 +46,6 @@ class ParentState extends State<Parent> {
         theme: new ThemeData(
           primaryColor: Colors.blue,
         ),
-        //passaggio importante, semplificano le chiamate per il navigator.push
         routes: <String, WidgetBuilder>{
           "/classic": (BuildContext context) => new Classic(),
           "/biliardo": (BuildContext context) => new Biliardo(),
@@ -57,29 +56,23 @@ class ParentState extends State<Parent> {
         },
         home: new Scaffold(
           appBar: new AppBar(
-            title: new Text(
-              "Segnapunti",
+            title: new Text("Segnapunti",
               style: new TextStyle(
-                  color: (darkTheme) ? Colors.black : Colors.white),
-            ),
+                  color: (darkTheme) ? Colors.black : Colors.white),),
             backgroundColor: Colors.blue,
             actions: <Widget>[
               new MaterialButton(
                 onPressed: () {
                   _saveValues(!darkTheme);
                 },
-                child: new Text(
-                  (darkTheme) ? "White Theme" : "Dark Theme",
+                child: new Text((darkTheme) ? "White Theme" : "Dark Theme",
                   style: new TextStyle(
                       color: (darkTheme) ? Colors.white : Colors.black),
-                ),
-              )
+                ),)
             ],
           ),
           body: new Flex(
-            children: <Widget>[
-              new MyApp(),
-            ],
+            children: <Widget>[new MyApp(),],
             direction: Axis.vertical,
           ),
           backgroundColor: (darkTheme)

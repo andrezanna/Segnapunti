@@ -53,7 +53,7 @@ class Biliardo extends StatefulWidget {
 class BiliardoState extends State<Biliardo> {
   int _playerName = 2;
   SharedPreferences prefs;
-
+  int index = 0;
   @override
   Widget build(BuildContext context) {
     getSharedPreferences();
@@ -69,69 +69,83 @@ class BiliardoState extends State<Biliardo> {
                 fontWeight: FontWeight.bold)),
         title: new Text('Biliardo'),
       ),
+
+      bottomNavigationBar: new Theme(
+        data: Theme.of(context).copyWith(
+          // sets the background color of the `BottomNavigationBar`
+          canvasColor: (darkTheme)
+              ? Color.fromARGB(255, 50, 50, 50)
+              : Color.fromARGB(255, 250, 250, 250),
+        ),
+        child: new BottomNavigationBar(
+          currentIndex: index,
+
+          onTap: (int index) {
+            switch (index) {
+              case 0:
+                _addPlayer();
+                break;
+              case 1:
+                _annulla();
+                break;
+              case 2:
+                reset();
+                break;
+            }
+
+
+            setState(() {
+              this.index = index;
+            });
+          },
+          items: <BottomNavigationBarItem>[
+            new BottomNavigationBarItem(
+              icon: new Icon(
+                Icons.add,
+              ),
+              title: new Text(
+                "Nuovo Giocatore",
+                textAlign: TextAlign.center,
+                style: new TextStyle(
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+            new BottomNavigationBarItem(
+              icon: new Icon(
+                Icons.arrow_back,
+              ),
+              title: new Text(
+                "Annulla",
+                textAlign: TextAlign.center,
+                style: new TextStyle(
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+            new BottomNavigationBarItem(
+              icon: new Icon(
+                Icons.refresh,
+              ),
+              title: new Text(
+                "Reset",
+                textAlign: TextAlign.center,
+                style: new TextStyle(
+                  color: Colors.blue,
+                ),
+              ),
+              ),
+          ],
+
+            ),
+
+
+      ),
       body: new ListView(
 
           children: <Widget>[
             buildBiliardo(),
             buildPlayers(),
-            new Container(
-              margin: EdgeInsets.all(12.0),
-              child: new Flex(
-                direction: Axis.horizontal,
-                children: <Widget>[
-                  new Expanded(
-                    child: new MaterialButton(
-                        onPressed: _addPlayer,
-                        child: new Column(children: <Widget>[
-                          new Icon(
-                            Icons.add,
-                            color: Colors.blue,
-                          ),
-                          new Center(
-                              child: new Text(
-                                "Nuovo Giocatore",
-                                textAlign: TextAlign.center,
-                                style: new TextStyle(
-                                  color: Colors.blue,
-                                ),
-                              ))
-                        ])),
-                  ),
-                  new Expanded(
-                    child: new MaterialButton(
-                        onPressed: (moves.length > 0) ? _annulla : null,
-                        child: new Column(children: <Widget>[
-                          new Icon(
-                            Icons.arrow_back,
-                            color: Colors.blue,
-                          ),
-                          new Text(
-                            "Annulla",
-                            style: new TextStyle(
-                              color: Colors.blue,
-                            ),
-                          )
-                        ])),
-                  ),
-                  new Expanded(
-                    child: new MaterialButton(
-                        onPressed: reset,
-                        child: new Column(children: <Widget>[
-                          new Icon(
-                            Icons.refresh,
-                            color: Colors.blue,
-                          ),
-                          new Text(
-                            "Reset",
-                            style: new TextStyle(
-                              color: Colors.blue,
-                            ),
-                          )
-                        ])),
-                  ),
-                ],
-              ),
-            ),
 
 
           ]),
@@ -331,12 +345,17 @@ class BiliardoState extends State<Biliardo> {
   }
 
   void _annulla() {
-    setState(() {
+    try {
       Moves move = moves.last;
-      moves.removeLast();
-      players[move.player].value -= move.value;
-      ballState[move.value - 1] = true;
-    });
+      setState(() {
+        moves.removeLast();
+        players[move.player].value -= move.value;
+        ballState[move.value - 1] = true;
+      });
+    } catch (e) {
+      print("nessuna mossa da annullare");
+    }
+
   }
 
   void reset() {
@@ -383,13 +402,11 @@ class BuildPlayer extends StatefulWidget {
 class BuildPlayerState extends State<BuildPlayer> {
 
   final TextEditingController _controller = new TextEditingController();
-  FocusNode focusNode = new FocusNode();
 
 
   @override
   Widget build(BuildContext context) {
     _controller.addListener(nameChange);
-    focusNode.addListener(_ensureVisible);
     double width = MediaQuery
         .of(context)
         .size
@@ -431,7 +448,6 @@ class BuildPlayerState extends State<BuildPlayer> {
               new TextField(
                 controller: _controller,
                 textAlign: TextAlign.center,
-                focusNode: focusNode,
                 decoration: new InputDecoration(
                   hintText: players[widget.index].name,
                   hintStyle: new TextStyle(
@@ -456,9 +472,6 @@ class BuildPlayerState extends State<BuildPlayer> {
     });
   }
 
-  void _ensureVisible() {
-    ensureVisible(context, focusNode);
-  }
 
   void nameChange() {
     if (_controller.text.length <= 30) {
