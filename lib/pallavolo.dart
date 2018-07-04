@@ -216,7 +216,6 @@ class VolleyScoreState extends State<VolleyScore> {
   @override
   Widget build(BuildContext context) {
     _controller.addListener(nameChange);
-    focusNode.addListener(_ensureVisible);
 
     return new Flex(
       direction: Axis.vertical,
@@ -286,9 +285,7 @@ class VolleyScoreState extends State<VolleyScore> {
     );
   }
 
-  void _ensureVisible() {
-    ensureVisible(context, focusNode);
-  }
+
 
   void nameChange() {
     if (_controller.text.isNotEmpty) {

@@ -248,7 +248,6 @@ class TennisScoreState extends State<TennisScore> {
   @override
   Widget build(BuildContext context) {
     _controller.addListener(nameChange);
-    focusNode.addListener(_ensureVisible);
 
     List<String> points = ["0", "15", "30", "40", "ADV"];
     return new Flex(
@@ -335,10 +334,6 @@ class TennisScoreState extends State<TennisScore> {
     prefs.setInt("TennisNumber", periodNumber);
     prefs.setBool("TennisTie", tieBreak);
     super.dispose();
-  }
-
-  void _ensureVisible() {
-    ensureVisible(context, focusNode);
   }
 
   void nameChange() {
