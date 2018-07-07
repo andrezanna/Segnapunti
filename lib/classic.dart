@@ -152,7 +152,6 @@ class BuildRowState extends State<BuildRow> {
 
   Widget _buildRow(int index) {
     _controller.addListener(nameChange);
-    focusNode.addListener(_ensureVisible);
     NumberPicker numberPicker = buildPickerInteger(index);
     play[index].setNumberPicker(numberPicker);
     return new Dismissible(
@@ -183,9 +182,7 @@ class BuildRowState extends State<BuildRow> {
         ));
   }
 
-  void _ensureVisible() {
-    ensureVisible(context, focusNode);
-  }
+
 
   Widget buildPickerInteger(int index) {
     return new NumberPicker.integer(
