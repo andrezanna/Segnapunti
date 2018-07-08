@@ -21,8 +21,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" fixedFrame="YES" insetsLayoutMarginsFromSafeArea="NO" image="launchIphone.png" translatesAutoresizingMaskIntoConstraints="NO" id="wC8-W6-P3e">
-                                <rect key="frame" x="37" y="183" width="300" height="300"/>
+                            <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" fixedFrame="YES" insetsLayoutMarginsFromSafeArea="NO" image="launcher300.png" translatesAutoresizingMaskIntoConstraints="NO" id="UHF-U0-Py6">
+                                <rect key="frame" x="38" y="183" width="298" height="300"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </imageView>
                         </subviews>
@@ -35,7 +35,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="launchIphone.png" width="300" height="300"/>
+        <image name="launcher300.png" width="300" height="300"/>
     </resources>
     <color key="tintColor" red="0.1388131678" green="0.5893743038" blue="0.95396393540000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>
