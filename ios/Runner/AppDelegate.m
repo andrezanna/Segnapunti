@@ -14,10 +14,7 @@
   [systemVersion setMethodCallHandler:^(FlutterMethodCall* call, FlutterResult result) {
    if ([@"getSystemVersion" isEqualToString:call.method]) {
      NSString*  systemVersion = [self getSystemVersion];
-
-
-       result(systemVersion);
-
+     result(systemVersion);
    } else {
      result(FlutterMethodNotImplemented);
    }

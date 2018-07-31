@@ -6,6 +6,7 @@ import 'package:Segnapunti/biliardo.dart';
 import 'package:Segnapunti/classic.dart';
 import 'package:Segnapunti/pallavolo.dart';
 import 'package:Segnapunti/rugby.dart';
+import 'package:Segnapunti/snooker.dart';
 import 'package:Segnapunti/tennis.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -53,6 +54,7 @@ class ParentState extends State<Parent> {
           "/rugby": (BuildContext context) => new Rugby(),
           "/tennis": (BuildContext context) => new Tennis(),
           "/volley": (BuildContext context) => new Volley(),
+          "/snooker": (BuildContext context) => new Snooker(),
         },
         home: new Scaffold(
           appBar: new AppBar(
@@ -185,6 +187,83 @@ class MyApp extends StatelessWidget {
                 child: new Center(
                   child: new MaterialButton(
                     onPressed: () {
+                      Navigator.of(context).pushNamed('/snooker');
+                    },
+                    child: new Padding(
+                      padding: new EdgeInsets.all(width > 600 ? 64.0 : 16.0),
+                      child: new Flex(
+                        direction: Axis.vertical,
+                        children: <Widget>[
+                          new Container(
+                            child: new Expanded(
+                              flex: 3,
+                              child: new Image.asset(
+                                //parte importante, definire gli asset per trovarli più velocemnte
+                                //si inseriscono nel pubspec.yaml
+                                'images/rossa.png',
+                              ),
+                            ),
+                          ),
+                          new Expanded(
+                            child: new Text(
+                              "SNOOKER",
+                              style: new TextStyle(
+                                color: (darkTheme) ? Colors.blue : Colors.black,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              new Expanded(
+                child: new Center(
+                  child: new MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/classic');
+                    },
+                    child: new Center(
+                      child: new Padding(
+                        padding: new EdgeInsets.all(width > 600 ? 64.0 : 16.0),
+                        child: new Flex(
+                          direction: Axis.vertical,
+                          children: <Widget>[
+                            new Expanded(
+                              flex: 3,
+                              child: new Image.asset(
+                                'images/numbers.png',
+                              ),
+                            ),
+                            new Expanded(
+                              child: new Text(
+                                "CLASSICO",
+                                style: new TextStyle(
+                                  color:
+                                  (darkTheme) ? Colors.blue : Colors.black,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+            ],
+          ),
+        ),
+        new Expanded(
+          child: new Flex(
+            direction: Axis.vertical,
+            children: <Widget>[
+              new Expanded(
+                child: new Center(
+                  child: new MaterialButton(
+                    onPressed: () {
                       Navigator.of(context).pushNamed('/basket');
                     },
                     child: new Center(
@@ -249,13 +328,7 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-        new Expanded(
-          child: new Flex(
-            direction: Axis.vertical,
-            children: <Widget>[
+
               new Expanded(
                 child: new Center(
                   child: new MaterialButton(
@@ -324,40 +397,7 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
               ),
-              new Expanded(
-                child: new Center(
-                  child: new MaterialButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/classic');
-                    },
-                    child: new Center(
-                      child: new Padding(
-                        padding: new EdgeInsets.all(width > 600 ? 64.0 : 16.0),
-                        child: new Flex(
-                          direction: Axis.vertical,
-                          children: <Widget>[
-                            new Expanded(
-                              flex: 3,
-                              child: new Image.asset(
-                                'images/numbers.png',
-                              ),
-                            ),
-                            new Expanded(
-                              child: new Text(
-                                "CLASSICO",
-                                style: new TextStyle(
-                                  color:
-                                  (darkTheme) ? Colors.blue : Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+
             ],
           ),
         ),

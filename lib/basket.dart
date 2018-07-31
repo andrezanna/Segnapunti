@@ -3,6 +3,8 @@ import 'package:Segnapunti/timertextformatter.dart';
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vibrate/vibrate.dart';
+
 
 int periodLength = 10;
 int teamFoulThreshold = 4;
@@ -122,7 +124,11 @@ class BasketState extends State<Basket> {
   }
 
 
-  void onTimeEnd(void a) {
+  void onTimeEnd(void a) async{
+    bool canVibrate = await Vibrate.canVibrate;
+    Vibrate.vibrate();
+    Vibrate.vibrate();
+    Vibrate.vibrate();
     setState(() {
       scores[inPeriod].setScores(
           team1.value - lastPeriod.team1, team2.value - lastPeriod.team2);

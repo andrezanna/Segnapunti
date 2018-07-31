@@ -5,6 +5,7 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: "0.4.1"
+  vibrate: "^0.0.3"
   numberpicker:
     git:
       url: git@github.com:andrezanna/NumberPicker.git
@@ -45,6 +46,13 @@ flutter:
     - images/tennis.png
     - images/rugby.png
     - images/numbers.png
+    - images/rossa.png
+    - images/rosa.png
+    - images/marrone.png
+    - images/blu.png
+    - images/verde.png
+    - images/nera.png
+    - images/gialla.png
     - icon/apple.png
     - icon/launcher300.png
   fonts:
