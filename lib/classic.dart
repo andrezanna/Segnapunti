@@ -1,6 +1,6 @@
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
-import 'package:numberpicker/numberpicker.dart';
+import 'package:Segnapunti/numberpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /**

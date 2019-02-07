@@ -10,8 +10,7 @@ final List<Player> players = <Player>[
 ];
 final List<Moves> moves = <Moves>[];
 final List<bool> ballState = new List.filled(7, true);
-int originalRedNumber;
-int redNumber;
+
 bool darkTheme = false;
 int inFoul = -1;
 
@@ -49,9 +48,7 @@ class Snooker extends StatefulWidget {
       players.clear();
       for (String p in playersSaved) players.add(new Player(p, 0));
     }
-    originalRedNumber = prefs.getInt("RedNumber");
-    if (originalRedNumber == null) originalRedNumber = 15;
-    redNumber = originalRedNumber;
+
   }
 }
 
@@ -63,19 +60,7 @@ class SnookerState extends State<Snooker> {
   @override
   Widget build(BuildContext context) {
     getSharedPreferences();
-    List<Widget> actions = <Widget>[
-      new MaterialButton(
-        onPressed: () {
-          Navigator.of(context).push(new MaterialPageRoute(
-              builder: (context) => new SnookerSettings()));
-        },
-        child: new Text(
-          "IMPOSTAZIONI",
-          style:
-              new TextStyle(color: (darkTheme) ? Colors.black : Colors.white),
-        ),
-      ),
-    ];
+
     return new Scaffold(
       appBar: new AppBar(
         leading: new BackButton(
@@ -87,7 +72,6 @@ class SnookerState extends State<Snooker> {
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold)),
         title: new Text('Snooker'),
-        actions: actions,
       ),
       bottomNavigationBar: new Theme(
         data: Theme.of(context).copyWith(
@@ -174,7 +158,6 @@ class SnookerState extends State<Snooker> {
     List<String> pl = new List();
     for (Player p in players) {
       pl.add(p.name);
-      print(p.name);
     }
     prefs.setStringList("SnookerPlayers", pl);
     super.dispose();
@@ -353,12 +336,12 @@ class SnookerState extends State<Snooker> {
       setState(() {
         moves.removeLast();
         players[move.player].value -= move.value;
-        if (move.value == 1) redNumber++;
-        ballState[move.value - 1] = true;
+        ballState[move.index - 1] = true;
       });
     } catch (e) {
       print("nessuna mossa da annullare");
     }
+
   }
 
   void reset() {
@@ -369,7 +352,6 @@ class SnookerState extends State<Snooker> {
     for (int i = 0; i < players.length; i++) {
       players[i].value = 0;
     }
-    redNumber = originalRedNumber;
     setState(() {});
   }
 
@@ -418,7 +400,7 @@ class BuildPlayerState extends State<BuildPlayer> {
         });
       },
       child: new DragTarget<BallMove>(onAccept: (BallMove data) {
-        addValue(data.value);
+        addValue(data.value,data.index);
       }, builder: (BuildContext context, List<BallMove> accepted,
           List<dynamic> rejected) {
         return new Container(
@@ -464,18 +446,14 @@ class BuildPlayerState extends State<BuildPlayer> {
     );
   }
 
-  void addValue(int value) {
+  void addValue(int value, int index) {
     setState(() {
       players[widget.index].value += value;
-      if (redNumber<=1) {
-        ballState[value - 1] = false;
-      } else {
-        if (value == 1) redNumber--;
-      }
-      moves.add(new Moves(value, widget.index));
+      moves.add(new Moves(value, widget.index,index));
       widget.onChanged(null);
       inFoul = -1;
     });
+
   }
 
   void nameChange() {
@@ -553,8 +531,9 @@ class MovableBallState extends State<MovableBall> {
 class Moves {
   int player;
   int value;
+  int index;
 
-  Moves(this.value, this.player);
+  Moves(this.value, this.player,this.index);
 }
 
 class BallMove {
@@ -564,68 +543,3 @@ class BallMove {
   BallMove(this.value, this.color){this.index=this.value;}
 }
 
-class SnookerSettings extends StatelessWidget {
-  final TextEditingController _redNumber = new TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    bool shown = false;
-
-    _redNumber.addListener(() {
-      if (_redNumber.text.isNotEmpty) {
-        int newValue = int.parse(_redNumber.text.toString());
-        if (newValue >= 0) {
-          redNumber = newValue;
-          originalRedNumber = newValue;
-        } else if (!(shown)) {
-          shown = true;
-          showDialog(
-              context: context,
-              builder: (context) => new AlertDialog(
-                    title: new Text("Valore non valido"),
-                    content: new Text("Deve esserci almeno un tempo"),
-                    actions: <Widget>[
-                      new MaterialButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          shown = false;
-                        },
-                        child: new Icon(Icons.close),
-                      )
-                    ],
-                  ));
-        }
-      }
-    });
-
-    return new Scaffold(
-      backgroundColor: (darkTheme)
-          ? Color.fromARGB(255, 50, 50, 50)
-          : Color.fromARGB(255, 250, 250, 250),
-      appBar: new AppBar(
-        leading: new BackButton(
-          color: (darkTheme) ? Colors.black : Colors.white,
-        ),
-      ),
-      body: new Column(children: <Widget>[
-        new ListTile(
-            trailing: new Text(
-              "Numero di Tempi",
-              style: new TextStyle(
-                  color: (darkTheme) ? Colors.blue : Colors.black),
-            ),
-            title: new TextField(
-              keyboardType: TextInputType.number,
-              decoration: new InputDecoration(
-                hintText: originalRedNumber.toString(),
-                hintStyle: new TextStyle(
-                    color: (darkTheme) ? Colors.blue : Colors.black),
-              ),
-              controller: _redNumber,
-              style: new TextStyle(
-                  color: (darkTheme) ? Colors.blue : Colors.black),
-            )),
-      ]),
-    );
-  }
-}

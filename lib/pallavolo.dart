@@ -1,6 +1,7 @@
 import 'package:Segnapunti/util.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speech_recognition/speech_recognition.dart';
 
 int periodWin = 25;
 int periodNumber = 5;
@@ -36,13 +37,70 @@ class VolleyState extends State<Volley> {
   VolleyPlayer player2 = new VolleyPlayer("Giocatore 2", 0, 2);
   final List<Scores> scores = new List();
   Scores lastPeriod = new Scores(0, 0);
+  VolleyPlayer lastPoint;
+  SpeechRecognition _speech;
+  bool _speechRecognitionAvailable;
+  String _currentLocale;
+  bool _isListening = false;
+  bool speechActive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    activateSpeechRecognizer();
+  }
+
+  void activateSpeechRecognizer() {
+    _speech = SpeechRecognition();
+    _speech.setAvailabilityHandler(
+        (bool result) => setState(() => _speechRecognitionAvailable = result));
+    _speech.setCurrentLocaleHandler(
+        (String locale) => setState(() => _currentLocale = locale));
+
+    _speech.setRecognitionCompleteHandler((text) {
+        getSpeech(text);
+        setState(() {_isListening=false;});
+    });
+
+    _speech.setErrorHandler(errorHandler);
+
+    _speech
+        .activate()
+        .then((res) => setState(() => _speechRecognitionAvailable = res));
+  }
+
+  void errorHandler(int error) {
+    switch (error) {
+
+      case 6:
+        if (!_isListening) {
+          _speech.listen(locale: _currentLocale);
+        }
+        break;
+      case 7:
+        if (!_isListening) {
+          _speech.listen(locale: _currentLocale);
+        }
+          break;
+
+      case 8:
+        _speech.cancel();
+        if (!_isListening) {
+          activateSpeechRecognizer();
+        }
+        break;
+
+      default:
+        activateSpeechRecognizer();
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     if (scores.isEmpty || scores.length != periodNumber) {
       scores.clear();
-      for (int i = 0; i < periodNumber; i++)
-        scores.add(new Scores(0, 0));
+      for (int i = 0; i < periodNumber; i++) scores.add(new Scores(0, 0));
       inPeriod = 0;
       player1.value = 0;
       player2.value = 0;
@@ -60,8 +118,8 @@ class VolleyState extends State<Volley> {
         },
         child: new Text(
           "IMPOSTAZIONI",
-          style: new TextStyle(
-              color: (darkTheme) ? Colors.black : Colors.white),
+          style:
+              new TextStyle(color: (darkTheme) ? Colors.black : Colors.white),
         ),
       ),
     ];
@@ -73,8 +131,8 @@ class VolleyState extends State<Volley> {
           },
           child: new Text(
             "NUOVA",
-            style: new TextStyle(
-                color: (darkTheme) ? Colors.black : Colors.white),
+            style:
+                new TextStyle(color: (darkTheme) ? Colors.black : Colors.white),
           ),
         ),
       );
@@ -82,12 +140,13 @@ class VolleyState extends State<Volley> {
     return new Scaffold(
       appBar: new AppBar(
         leading: new BackButton(
-          color: (darkTheme) ? Colors.black : Colors.white,),
-        textTheme: new TextTheme(title: new TextStyle(
-            color: (darkTheme) ? Colors.black : Colors.white,
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold)),
-
+          color: (darkTheme) ? Colors.black : Colors.white,
+        ),
+        textTheme: new TextTheme(
+            title: new TextStyle(
+                color: (darkTheme) ? Colors.black : Colors.white,
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold)),
         title: new Text('Volley'),
         actions: actions,
       ),
@@ -106,6 +165,24 @@ class VolleyState extends State<Volley> {
           padding: const EdgeInsets.all(36.0),
           child: new HorizontalScorePeriod(scores, player1, player2, darkTheme),
         ),
+        new FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              speechActive = !speechActive;
+              if (_isListening) {
+                _speech.stop();
+              }
+              if (speechActive) {
+                _speech.listen(locale: _currentLocale);
+              }
+            });
+          },
+          child: new Icon(
+            (speechActive) ? Icons.mic : Icons.mic_off,
+            color: (speechActive) ? Colors.red : Colors.black12,
+          ),
+          backgroundColor: Colors.grey,
+        ),
         new Expanded(
           child: new Row(
             mainAxisSize: MainAxisSize.max,
@@ -122,6 +199,7 @@ class VolleyState extends State<Volley> {
   }
 
   void pointScored(VolleyPlayer player) {
+    lastPoint = player;
     if (inPeriod == scores.length || matchWon) {
       matchWon = true;
     } else {
@@ -162,23 +240,58 @@ class VolleyState extends State<Volley> {
     if (matchWon) {
       showDialog(
         context: context,
-        builder: (BuildContext context) =>
-        new AlertDialog(
-          title: new Text("La partita è stata vinta"),
-          content: new Text("Vuoi fare una nuova partita?"),
-          actions: <Widget>[
-            new CloseButton(),
-            new MaterialButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                newMatch();
-              },
-              child: new Icon(Icons.done),
-            )
-          ],
-        ),
+        builder: (BuildContext context) => new AlertDialog(
+              title: new Text("La partita è stata vinta"),
+              content: new Text("Vuoi fare una nuova partita?"),
+              actions: <Widget>[
+                new CloseButton(),
+                new MaterialButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    newMatch();
+                  },
+                  child: new Icon(Icons.done),
+                )
+              ],
+            ),
       );
     }
+
+    if (speechActive && !_isListening) {
+      _speech.listen(locale: _currentLocale);
+    }
+  }
+
+  void revertPoint() {
+    if (matchWon) {
+      setState(() {
+        matchWon = false;
+      });
+    }
+    if (player1.value == 0 && player2.value == 0) {
+      inPeriod -= 1;
+
+      player1.value = scores[inPeriod].team1;
+      player2.value = scores[inPeriod].team2;
+
+      if (player1.setWon == (periodNumber / 2).floor() &&
+          player2.setWon == (periodNumber / 2).floor() &&
+          tieBreak) inTieBreak = true;
+    }
+    if (lastPoint == player1) {
+      setState(() {
+        player1.value -= 1;
+      });
+    } else if (lastPoint == player2) {
+      setState(() {
+        player2.value -= 1;
+      });
+    }
+    if (speechActive && !_isListening) {
+      _speech.listen(locale: _currentLocale);
+    }
+    lastPoint = null;
+
   }
 
   void newMatch() {
@@ -190,11 +303,51 @@ class VolleyState extends State<Volley> {
       player2.service = false;
       player1.setWon = 0;
       player2.setWon = 0;
+      lastPoint = null;
       scores.clear();
-      for (int i = 0; i < periodNumber; i++)
-        scores.add(new Scores(0, 0));
+      for (int i = 0; i < periodNumber; i++) scores.add(new Scores(0, 0));
       matchWon = false;
     });
+    if (speechActive && !_isListening) {
+      _speech.listen(locale: _currentLocale);
+    }
+  }
+
+  void getSpeech(String speech) {
+    print("RICEVUTO $speech, $_isListening");
+    List<String> words = speech.split(" ");
+    switch (words.length) {
+      case 1:
+        oneWord(speech);
+        break;
+      default:
+        if (!_isListening) {
+          _speech.listen(locale: _currentLocale);
+        }break;
+
+    }
+  }
+
+  void oneWord(String speech) {
+    print("ONEWORD");
+    List<String> revertLast = ["ANNULLA", "CANCELLA"];
+    List<String> reMatch = ["NUOVA", "RIVINCITA"];
+
+    if (speech.toUpperCase() == player1.name.toUpperCase()) {
+      setState(() {
+        if (!matchWon) player1.value += 1;
+      });
+      pointScored(player1);
+    } else if (speech.toUpperCase() == player2.name.toUpperCase()) {
+      setState(() {
+        if (!matchWon) player2.value += 1;
+      });
+      pointScored(player2);
+    } else if (revertLast.contains(speech.toUpperCase()) && lastPoint != null) {
+      revertPoint();
+    } else if (reMatch.contains(speech.toUpperCase()) && matchWon) {
+      newMatch();
+    }
   }
 }
 
@@ -209,7 +362,6 @@ class VolleyScore extends StatefulWidget {
 }
 
 class VolleyScoreState extends State<VolleyScore> {
-
   final TextEditingController _controller = new TextEditingController();
   FocusNode focusNode = new FocusNode();
 
@@ -257,9 +409,9 @@ class VolleyScoreState extends State<VolleyScore> {
                 hintText: widget.team.name,
                 hintStyle: new TextStyle(
                     color: (darkTheme) ? Colors.blue : Colors.black),
-
               ),
-              style: new TextStyle(fontSize: 30.0,
+              style: new TextStyle(
+                  fontSize: 30.0,
                   fontWeight: FontWeight.bold,
                   color: (darkTheme) ? Colors.blue : Colors.black54),
             ),
@@ -277,15 +429,12 @@ class VolleyScoreState extends State<VolleyScore> {
                 "Punto",
                 style: new TextStyle(
                     fontSize: 25.0,
-
                     color: (darkTheme) ? Colors.blue : Colors.black),
               )),
         ),
       ],
     );
   }
-
-
 
   void nameChange() {
     if (_controller.text.isNotEmpty) {
@@ -324,21 +473,20 @@ class VolleySettingsState extends State<VolleySettings> {
           shown = true;
           showDialog(
               context: context,
-              builder: (context) =>
-              new AlertDialog(
-                title: new Text("Valore non valido"),
-                content: new Text(
-                    "Il numero di giochi per vincere il set deve essere maggiore di 0"),
-                actions: <Widget>[
-                  new MaterialButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      shown = false;
-                    },
-                    child: new Icon(Icons.close),
-                  )
-                ],
-              ));
+              builder: (context) => new AlertDialog(
+                    title: new Text("Valore non valido"),
+                    content: new Text(
+                        "Il numero di giochi per vincere il set deve essere maggiore di 0"),
+                    actions: <Widget>[
+                      new MaterialButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          shown = false;
+                        },
+                        child: new Icon(Icons.close),
+                      )
+                    ],
+                  ));
           shown = false;
         }
       }
@@ -352,39 +500,43 @@ class VolleySettingsState extends State<VolleySettings> {
           shown = true;
           showDialog(
               context: context,
-              builder: (context) =>
-              new AlertDialog(
-                title: new Text("Valore non valido"),
-                content: new Text("Deve esserci almeno un set"),
-                actions: <Widget>[
-                  new MaterialButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      shown = false;
-                    },
-                    child: new Icon(Icons.close),
-                  )
-                ],
-              ));
+              builder: (context) => new AlertDialog(
+                    title: new Text("Valore non valido"),
+                    content: new Text("Deve esserci almeno un set"),
+                    actions: <Widget>[
+                      new MaterialButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          shown = false;
+                        },
+                        child: new Icon(Icons.close),
+                      )
+                    ],
+                  ));
           shown = false;
         }
       }
     });
     return new Scaffold(
-      appBar: new AppBar(leading: new BackButton(
-        color: (darkTheme) ? Colors.black : Colors.white,),
-        textTheme: new TextTheme(title: new TextStyle(
-            color: (darkTheme) ? Colors.black : Colors.white,
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold)),
+      appBar: new AppBar(
+        leading: new BackButton(
+          color: (darkTheme) ? Colors.black : Colors.white,
+        ),
+        textTheme: new TextTheme(
+            title: new TextStyle(
+                color: (darkTheme) ? Colors.black : Colors.white,
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold)),
       ),
       backgroundColor: (darkTheme)
           ? Color.fromARGB(255, 50, 50, 50)
           : Color.fromARGB(255, 250, 250, 250),
       body: new Column(children: <Widget>[
         new ListTile(
-            trailing: new Text("Giochi per Set", style: new TextStyle(
-                color: (darkTheme) ? Colors.blue : Colors.black),
+            trailing: new Text(
+              "Giochi per Set",
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             ),
             title: new TextField(
               keyboardType: TextInputType.number,
@@ -392,16 +544,16 @@ class VolleySettingsState extends State<VolleySettings> {
                 hintText: periodWin.toString(),
                 hintStyle: new TextStyle(
                     color: (darkTheme) ? Colors.blue : Colors.black),
-
               ),
               controller: _periodWin,
               style: new TextStyle(
                   color: (darkTheme) ? Colors.blue : Colors.black),
-
             )),
         new ListTile(
-            trailing: new Text("Tie Break", style: new TextStyle(
-                color: (darkTheme) ? Colors.blue : Colors.black),
+            trailing: new Text(
+              "Tie Break",
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             ),
             title: new Switch(
               value: tieBreak,
@@ -412,8 +564,10 @@ class VolleySettingsState extends State<VolleySettings> {
               },
             )),
         new ListTile(
-            trailing: new Text("Al Meglio di (# set)", style: new TextStyle(
-                color: (darkTheme) ? Colors.blue : Colors.black),
+            trailing: new Text(
+              "Al Meglio di (# set)",
+              style: new TextStyle(
+                  color: (darkTheme) ? Colors.blue : Colors.black),
             ),
             title: new TextField(
               keyboardType: TextInputType.number,
@@ -421,12 +575,10 @@ class VolleySettingsState extends State<VolleySettings> {
                 hintText: periodNumber.toString(),
                 hintStyle: new TextStyle(
                     color: (darkTheme) ? Colors.blue : Colors.black),
-
               ),
               controller: _periodNumber,
               style: new TextStyle(
                   color: (darkTheme) ? Colors.blue : Colors.black),
-
             )),
       ]),
     );
